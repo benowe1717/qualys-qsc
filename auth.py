@@ -55,11 +55,45 @@ class qualysApiAuth():
 
         try:
             with open(self._SESSION_FILE) as file:
-                self._sessionid = file.readlines()
+                data = file.readlines()
+                self._sessionid = data[0].strip("\n")
         except FileNotFoundError:
+            # This simply means the .session_token file has not been created yet, likely implying
+            # that a successful login has not occurred yet, this is ok, just trigger another login
+            pass
+        except IndexError:
+            # This likely means that the .session_token file exists but is empty, maybe ran into
+            # an error writing to the file, this is also ok, just trigger another login
             pass
 
-        self.login()
+        if not self._sessionid:
+            self.login()
+
+        test = self.testAPI()
+        if not test:
+            print(f"ERROR: Unable to authenicate to the Qualys API! Please double-check your credentials in {self._CREDS} for accuracy and try again!")
+            exit(1)
+
+    def testAPI(self):
+        """
+            This method is used to test the session id that is either read from the disk or
+            genereated by the self.login() method. If this API call returns a 200, we are safe
+            to continue and do not need to refresh or recreate a session id.
+
+            output: boolean
+            result: True/False
+        """
+        action = "list"
+        endpoint = "/fo/report/"
+        url = self.SCHEME + self.BASE_URL + self.API_VERSION + endpoint
+        payload = f"action={action}"
+        cookies = {"QualysSession": self._sessionid}
+        r = requests.post(url=url, headers=self.headers, data=payload, cookies=cookies)
+        if r.status_code == 200:
+            return True
+        else:
+            print(f"ERROR: Unable to complete test of the API! Details: Status Code: {r.status_code} :: Response Text: {r.text} :: Headers: {r.headers}")
+            return False
 
     def login(self):
         """
@@ -78,7 +112,7 @@ class qualysApiAuth():
         payload = f"action={action}&username={self._username}&password={quote(self._password, safe='')}"
         r = requests.post(url=url, headers=self.headers, data=payload)
         if r.status_code == 200:
-            self.writeSessionToken(r.headers["SetCookie"])
+            self.writeSessionToken(r.headers["Set-Cookie"])
             return True
         elif r.status_code == 401:
             print(f"ERROR: Unable to authenticate to the Qualys API with the user {self._username}!")
@@ -87,8 +121,25 @@ class qualysApiAuth():
             print(f"ERROR: Unable to contact the Qualys API!")
             exit(1)
 
-    def refreshSession(self):
-        pass
-
     def writeSessionToken(self, token):
-        pass
+        """
+            This method takes the token argument as an input, which is the Session ID/Session Token given
+            by the login() method so that user credentials should only have to be passed over the network
+            one time, and the rest of the api calls can be done with the appropriate session.
+
+            param: token
+            type: string
+            sample: QualysSession=abcdef0123456789; path=/somepath; secure; HttpOnly, DWRSESSIONID=abcdef0123456789; path=/somepath; secure
+
+            output: boolean
+            result: True
+        """
+        try:
+            with open(self._SESSION_FILE, "w") as file:
+                split_token = token.split(";")
+                new_split = split_token[0].split("=")
+                self._sessionid = new_split[1]
+                file.write(self._sessionid)
+        except:
+            print(f"ERROR: Unable to write Session ID to file!")
+            exit(1)

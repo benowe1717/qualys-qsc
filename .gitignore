@@ -1,1 +1,4 @@
 .creds.yaml
+.session_token
+*.py[cod]
+__pycache__/
