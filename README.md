@@ -43,7 +43,7 @@ Alternatively see the GitHub documentation on [creating a pull request](https://
 
 Thanks to the following people who have contributed to this project:
 
-- @benowe1717
+- [@benowe1717](https://github.com/benowe1717)
 
 ## Contact
 
