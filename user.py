@@ -38,6 +38,7 @@ class qualysApiUser():
     ######################
     failed_users = []
     headers = {"X-Requested-With": "Python3Requests", "Content-Type": "application/x-www-form-urlencoded"}
+    required_fields = ["user_role", "business_unit", "first_name", "last_name", "title", "phone", "email", "address1", "city", "country", "state"]
 
     def __init__(self):
         # Instantiate the qualysApiAuth() class, which will run all the required authentication checks

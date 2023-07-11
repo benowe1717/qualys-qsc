@@ -8,7 +8,7 @@ def printVersion():
     """
         This function is used in the argparse library to print the current version of this application
     """
-    print("qsc_automation.py 0.0.4")
+    print("qsc_automation.py 0.0.5")
     print("This is free software: you are free to change and redistribute it.")
     print("There is NO WARRANTY, to the extent permitted by law.\n")
     print("Written by Benjamin Owen; see below for original code")
@@ -37,6 +37,31 @@ def readCsv(filename):
         print(f"ERROR: The given file is not a CSV file!")
         return False
 
+def validateHeaders(required_fields, given_fields):
+    """
+        This function takes the list of required fields (required_fields) and compares it to the
+        list of input fields (given_fields) to determine if we are given all the required fields
+
+        param: list1
+        type: list
+        sample: [field1, field2, field3]
+
+        param: list2
+        type: list
+        sample: [field1, field2]
+
+        output: boolean/list
+        result if lists match: True
+        result if lists fail: list of missing fields
+        sample: [field3]
+    """
+    s = set(given_fields)
+    missing_fields = [x for x in required_fields if x not in s]
+    if len(missing_fields) > 0:
+        return missing_fields
+    else:
+        return True
+
 def main():
     parser = argparse.ArgumentParser(prog="qsc_automation.py", description="Qualys QSC Hands-on Training is a `tool` that allows `administrators/trainers` to `provision accounts in a Qualys subscription`.")
     parser.add_argument("--version", action="store_true", required=False, help="show this program's current version")
@@ -64,26 +89,40 @@ def main():
                     args.file.remove(f)
                 else:
                     dataframes.append([result, f])
+
         print(f"Remaining files to use: {args.file}")
 
-        # convert to while loop so we can say we're done whenever
         if len(args.file) > 0:
-            # instantiate user class
-            # user = qualysApiUser()
-            # check header row for required fields
-            # if all required fields exist, loop through rows and create users
-                # convert each row into the dict using the header as the key
-                # and using the row value as the value
-                # pass the entire dict to the user class
-                # errors = 0
-                # user.addUser(user_details=user_details)
-                # if the user creation fails
-                    # set errors=1
-            # if any required field is missing
-                # remove entire csv from list and move to the next one
-            # if errors=1
-                # print list of users that were failed to create users.failed_users
-            pass
+            for df in dataframes:
+                # This may seem like an unnecessary thing to repeat, however, since we try to use session-based
+                # authentication whenever possible, we want to ensure we are refreshing that active session before
+                # any critical work needs to be done to help minimize authentication issues in the middle of work
+                user = qualysApiUser()
+
+                # This returns just the first row of the dataframe, which will be the header row
+                header = list(df[0])
+
+                # Now compare the required fields to the given fields
+                missing = validateHeaders(user.required_fields, header)
+                if not missing:
+                    print(f"ERROR: {df[1]} is missing one more required fields! Please add the following headers to your CSV:")
+                    print(", ".join(missing))
+                    continue
+
+                user_dicts = df[0].to_dict(orient="records")
+                i = 0
+                errors = 0
+                while i < len(user_dicts):
+                    user_details = user_dicts[i]
+                    result = user.addUser(user_details=user_details)
+                    if not result:
+                        errors += 1
+                    i += 1
+
+                if errors > 0:
+                    print(f"{errors} users were not able to be created! Please check their details for accuracy!")
+                    print(", ".join(users.failed_users))
+
         else:
             print("No files remain to be parsed! Exiting...")
             exit(0)
