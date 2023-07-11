@@ -37,7 +37,6 @@ class qualysApiUser():
     ### PUBLIC OBJECTS ###
     ######################
     headers = {"X-Requested-With": "Python3Requests", "Content-Type": "application/x-www-form-urlencoded"}
-    subscription = ""
 
     def __init__(self):
         # Instantiate the qualysApiAuth() class, which will run all the required authentication checks
