@@ -2,3 +2,4 @@
 .session_token
 *.py[cod]
 __pycache__/
+*.csv
