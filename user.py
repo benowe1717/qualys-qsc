@@ -47,6 +47,8 @@ class qualysApiUser():
 
     def addUser(self, user_details):
         """
+            https://www.qualys.com/docs/qualys-api-vmpc-user-guide.pdf#G17.783431
+            https://documenter.getpostman.com/view/7159960/SVzw51A9#52dc0ffe-a2ae-4dea-9cbb-661251477df5
             This method takes in a dictionary of user_details and creates the user in the given Qualys subscription.
             Not all users will have the same details, but there are some required details that will stay the same.
 
@@ -55,7 +57,7 @@ class qualysApiUser():
             sample: {
                 user_role: "role", business_unit: "unit", first_name: "fname", last_name: "lname", title: "title",
                 phone: 1112223333, email: "name@domain.tld", address1: "1 Main Street", city: "Park Place",
-                country: "US", state: "MN"
+                country: "United States of America", state: "New York"
             }
 
             output: boolean
