@@ -27,7 +27,7 @@ class qualysApiAuth():
     ### PUBLIC CONSTANTS ###
     ########################
     SCHEME = "https://"
-    BASE_URL = "qualysapi.qg3.apps.qualys.com/api"
+    BASE_URL = ""
     API_VERSION = "/2.0"
 
     #######################
@@ -48,6 +48,7 @@ class qualysApiAuth():
                 creds = yaml.safe_load(file)
                 self._username = creds["credentials"]["username"]
                 self._password = creds["credentials"]["password"]
+                self.BASE_URL = creds["api"]["base_url"]
         except FileNotFoundError:
             print(f"ERROR: Unable to locate {self._CREDS}!")
             print("You either need to create this file and populate it with your credentials or you need to specify the correct path to your credentials on line 23!")
@@ -66,13 +67,28 @@ class qualysApiAuth():
             # an error writing to the file, this is also ok, just trigger another login
             pass
 
+        # The following flow will work like this:
+        # If the .session_token file is missing or empty
+        # assume that this is the first ever login and call
+        # the self.login() method, which writes to the .session_token
+        
+        # Next try to test the API for a 200 response code
+        # If this first test fails, it is likely because the .session_token
+        # file was read and the session id has expired. call the self.login()
+        # method to refresh the session id and try again. if it fails twice
+        # then likely the credentials are wrong OR the base domain is wrong
+
         if not self._sessionid:
             self.login()
 
         test = self.testAPI()
         if not test:
-            print(f"ERROR: Unable to authenicate to the Qualys API! Please double-check your credentials in {self._CREDS} for accuracy and try again!")
-            exit(1)
+            print("It looks like your session has expired! Refreshing the session cookie...")
+            self.login()
+            test = self.testAPI()
+            if not test:
+                print(f"ERROR: Unable to authenicate to the Qualys API! Please double-check your credentials in {self._CREDS} for accuracy and try again!")
+                exit(1)
 
     def testAPI(self):
         """
