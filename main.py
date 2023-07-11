@@ -76,15 +76,13 @@ def main():
                 # and using the row value as the value
                 # pass the entire dict to the user class
                 # errors = 0
-                # failed_users = []
                 # user.addUser(user_details=user_details)
                 # if the user creation fails
                     # set errors=1
-                    # append email of user to failed_users list
             # if any required field is missing
                 # remove entire csv from list and move to the next one
             # if errors=1
-                # print list of users that were failed to create
+                # print list of users that were failed to create users.failed_users
             pass
         else:
             print("No files remain to be parsed! Exiting...")

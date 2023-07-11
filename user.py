@@ -36,6 +36,7 @@ class qualysApiUser():
     ######################
     ### PUBLIC OBJECTS ###
     ######################
+    failed_users = []
     headers = {"X-Requested-With": "Python3Requests", "Content-Type": "application/x-www-form-urlencoded"}
 
     def __init__(self):
@@ -76,5 +77,6 @@ class qualysApiUser():
         if r.status_code == 200:
             return True
         else:
-            print(f"ERROR: Unable to create User {value}! Response Code: {r.status_code} :: Headers: {r.headers} :: Details: {r.text}")
+            print(f"ERROR: Unable to create User {email}! Response Code: {r.status_code} :: Headers: {r.headers} :: Details: {r.text}")
+            failed_users.append(email)
             return False
