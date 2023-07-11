@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from auth import qualysApiAuth
 from user import qualysApiUser
 from pandas.errors import ParserError
 import argparse, os, sys
@@ -66,6 +67,7 @@ def main():
     parser = argparse.ArgumentParser(prog="qsc_automation.py", description="Qualys QSC Hands-on Training is a `tool` that allows `administrators/trainers` to `provision accounts in a Qualys subscription`.")
     parser.add_argument("--version", action="store_true", required=False, help="show this program's current version")
     parser.add_argument("-f", "--file", nargs="+", required=False)
+    parser.add_argument("-t", "--test", action="store_true", required=False, help="Test the API using the credentials on file before taking any actions")
     args = parser.parse_args()
 
     if len(sys.argv) == 1:
@@ -74,6 +76,11 @@ def main():
 
     if args.version:
         printVersion()
+        parser.exit()
+
+    if args.test:
+        auth = qualysApiAuth()
+        print("Success! Your credentials are valid!")
         parser.exit()
 
     if args.file:
