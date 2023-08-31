@@ -119,16 +119,23 @@ def main():
                 user_dicts = df[0].to_dict(orient="records")
                 i = 0
                 errors = 0
+                successes = 0
                 while i < len(user_dicts):
                     user_details = user_dicts[i]
                     result = user.addUser(user_details=user_details)
                     if not result:
                         errors += 1
+                    else:
+                        successes += 1
                     i += 1
 
                 if errors > 0:
                     print(f"{errors} users were not able to be created! Please check their details for accuracy!")
-                    print(", ".join(users.failed_users))
+                    print(", ".join(user.failed_users))
+                
+                if successes > 0:
+                    print(f"{successes} users were created successfully!")
+                    print(", ".join(user.successful_users))
 
         else:
             print("No files remain to be parsed! Exiting...")

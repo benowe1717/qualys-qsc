@@ -16,16 +16,32 @@ Before you begin, ensure you have met the following requirements:
 
 To install `Qualys QSC Hands-on Training`, follow these steps:
 
-- List any steps required to install
-- Separate steps if they differ by Operating System or by dependency etc
-- Link to any best practices or troubleshooting guides where relevant
+- Install all required libraries using the `requirements.txt` file and `pip3`:
+`pip3 install requirements.txt`
+
+- Create the credentials yaml file that is necessary:
+Create a file in the same directory as `main.py` called `.creds.yaml`
+Fill in the yaml file as:
+credentials:
+  username: ""
+  password: ""
+
+api:
+  base_url: "qualysapi.qg4.apps.qualys.com/api"
+
+You may want to update the base_url to match where your Qualys instance is
 
 ## Using
 
 To use `Qualys QSC Hands-on Training`, follow these steps:
 
-- List any steps required to use
-- Link to any best practices or troubleshooting guides where relevant
+- To test your credentials, run the program like this:
+`python3 main.py --test`
+
+This will show you if your credentials are valid or need updating.
+
+- To create users, run the program like this:
+`python3 main.py --file /some/path/to/your/file.csv`
 
 ## Contributing to Qualys QSC
 
