@@ -28,7 +28,7 @@ class qualysApiAuth():
     ########################
     SCHEME = "https://"
     BASE_URL = ""
-    API_VERSION = "/2.0"
+    API_VERSION = "/api/2.0"
 
     #######################
     ### PRIVATE OBJECTS ###
