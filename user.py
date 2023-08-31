@@ -20,13 +20,13 @@ class qualysApiUser():
     ### PRIVATE CONSTANTS ###
     #########################
     _PATH = os.path.dirname(os.path.realpath(__file__))
-    _CONFIG = _PATH + "/config.yaml"
+    _CONFIG = _PATH + "/.creds.yaml"
 
     ########################
     ### PUBLIC CONSTANTS ###
     ########################
     SCHEME = "https://"
-    BASE_URL = "qualysapi.qg3.apps.qualys.com"
+    BASE_URL = ""
 
     #######################
     ### PRIVATE OBJECTS ###
@@ -39,8 +39,19 @@ class qualysApiUser():
     failed_users = []
     headers = {"X-Requested-With": "Python3Requests", "Content-Type": "application/x-www-form-urlencoded"}
     required_fields = ["user_role", "business_unit", "first_name", "last_name", "title", "phone", "email", "address1", "city", "country", "state"]
+    successful_users = []
 
     def __init__(self):
+        # Read in the config file to grab the base URL
+        try:
+            with open(self._CONFIG, "r") as file:
+                config = yaml.safe_load(file)
+                self.BASE_URL = config["api"]["base_url"].split("/")[0] # the /api is not needed for this class
+        except FileNotFoundError:
+            print(f"ERROR: Unable to locate {self._CONFIG}!")
+            print("You either need to create this file and populate it with your config or you need to specify the correct path to your config on line 23!")
+            exit(1)
+
         # Instantiate the qualysApiAuth() class, which will run all the required authentication checks
         # right out of the gate. If there are any problems authenticating, it will die right here.
         # Otherwise, we continue as normal
@@ -76,8 +87,9 @@ class qualysApiUser():
         basic = requests.auth.HTTPBasicAuth(self._auth._username, self._auth._password)
         r = requests.post(url=url, headers=self.headers, data=payload, auth=basic)
         if r.status_code == 200:
+            self.successful_users.append(email)
             return True
         else:
             print(f"ERROR: Unable to create User {email}! Response Code: {r.status_code} :: Headers: {r.headers} :: Details: {r.text}")
-            failed_users.append(email)
+            self.failed_users.append(email)
             return False
