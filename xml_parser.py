@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import xml.etree.ElementTree as ET
+import xmltodict, re
 
 class qualysApiXmlParser():
     """
@@ -34,9 +34,8 @@ class qualysApiXmlParser():
 
     def __init__(self, xml_data):
         try:
-            tree = ET.fromstring(xml_data)
-            self.xml_data = tree
-        except TypeError:
+            self.xml_data = xmltodict.parse(xml_data)
+        except:
             print(f"ERROR: Unable to parse XML Output!")
             exit(1)
 
@@ -45,17 +44,20 @@ class qualysApiXmlParser():
             This method is used to parse the XML Output of the
             Qualys API User Creation call to determine if the result
             was actually successful or not
-        """
-        for item in self.xml_data.iter("USER_OUTPUT"):
-            for child in item:
-                if child.tag == "RETURN":
-                    status = child.get("status")
 
-                    if status == "FAILED":
-                        for grandchild in child:
-                            if grandchild.tag == "MESSAGE":
-                                message = grandchild.text
-                                
-                                self.err_msg = message
-                                return False
-        return True
+            {"USER_OUTPUT": {"API": {"@name": "user.php", "@username": "yourapiusername", "@at": "1970-01-01T00:00:00Z"},
+            "RETURN": {"@status": "SUCCESS", "MESSAGE": "some_username user has been successfully created."}}}
+
+            {"USER_OUTPUT": {"API": {"@name": "user.php", "@username": "yourapiusername", "@at": "1970-01-01T00:00:00Z"},
+            "RETURN": {"@status": "FAILED", "@number": "1234", MESSAGE": "failure reason goes here"}}}
+        """
+        status = self.xml_data["USER_OUTPUT"]["RETURN"]["@status"]
+
+        if status == "FAILED":
+            message = self.xml_data["USER_OUTPUT"]["RETURN"]["MESSAGE"]
+            self.err_msg = message
+            return False
+        elif status == "SUCCESS":
+            message = self.xml_data["USER_OUTPUT"]["RETURN"]["MESSAGE"]
+            username = re.search(r"^(?P<username>[a-z0-9]+)\s+user\s+has", message)
+            return username

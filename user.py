@@ -43,9 +43,10 @@ class qualysApiUser():
     ######################
     ### PUBLIC OBJECTS ###
     ######################
-    failed_users = []
     headers = {"X-Requested-With": "Python3Requests", "Content-Type": "application/x-www-form-urlencoded"}
+    failed_users = []
     successful_users = []
+    users_to_tag = []
 
     def __init__(self):
         # Instantiate the qualysApiAuth() class, which will run all the required authentication checks
@@ -139,6 +140,7 @@ class qualysApiUser():
                 return False
             else:
                 self.successful_users.append(email)
+                self.users_to_tag.append(result)
                 return True
         else:
             print(f"ERROR: Unable to create User {email}! URL: {url} :: Response Code: {r.status_code} :: Headers: {r.headers} :: Details: {r.text}")
