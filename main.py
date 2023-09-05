@@ -9,7 +9,7 @@ def printVersion():
     """
         This function is used in the argparse library to print the current version of this application
     """
-    print("qsc_automation.py 0.1.1")
+    print("qsc_automation.py 0.1.2")
     print("This is free software: you are free to change and redistribute it.")
     print("There is NO WARRANTY, to the extent permitted by law.\n")
     print("Written by Benjamin Owen; see below for original code")
@@ -64,7 +64,7 @@ def validateHeaders(required_fields, given_fields):
         return True
 
 def main():
-    parser = argparse.ArgumentParser(prog="qsc_automation.py", description="Qualys QSC Hands-on Training is a `tool` that allows `administrators/trainers` to `provision accounts in a Qualys subscription`.")
+    parser = argparse.ArgumentParser(prog="main.py", description="Qualys QSC Hands-on Training is a `tool` that allows `administrators/trainers` to `provision accounts in a Qualys subscription`.")
     parser.add_argument("--version", action="store_true", required=False, help="show this program's current version")
     parser.add_argument("-f", "--file", nargs="+", required=False)
     parser.add_argument("-t", "--test", action="store_true", required=False, help="Test the API using the credentials on file before taking any actions")
@@ -110,7 +110,7 @@ def main():
                 header = list(df[0])
 
                 # Now compare the required fields to the given fields
-                missing = validateHeaders(user.required_fields, header)
+                missing = validateHeaders(user.REQUIRED_FIELDS, header)
                 if not missing:
                     print(f"ERROR: {df[1]} is missing one more required fields! Please add the following headers to your CSV:")
                     print(", ".join(missing))
