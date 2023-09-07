@@ -9,7 +9,7 @@ def printVersion():
     """
         This function is used in the argparse library to print the current version of this application
     """
-    print("qsc_automation.py 0.1.2")
+    print("qsc_automation.py 0.1.3")
     print("This is free software: you are free to change and redistribute it.")
     print("There is NO WARRANTY, to the extent permitted by law.\n")
     print("Written by Benjamin Owen; see below for original code")
@@ -17,7 +17,9 @@ def printVersion():
 
 def readCsv(filename):
     """
-        This function is used in two ways. 1) Test if the file is in fact a CSV file and 2) Read the data from a CSV file into a pandas dataframe
+        This function is used in two ways:
+        1) Test if the file is in fact a CSV file and 
+        2) Read the data from a CSV file into a pandas dataframe
     """
     decoders = ["ISO-8859-1", "utf-8", "unicode_escape"]
     try:
