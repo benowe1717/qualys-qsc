@@ -70,3 +70,5 @@ VALID_IN_STATES = [
 REQUIRED_FIELDS = [
     "user_role", "business_unit", "first_name", "last_name", "title", "phone", "email", "address1", "city", "country", "state"
 ]
+
+GLOBAL_TAG = "QSC"
