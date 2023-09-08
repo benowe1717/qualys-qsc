@@ -5,11 +5,51 @@ from pandas.errors import ParserError
 import argparse, os, sys
 import pandas as pd
 
+def create(df):
+    # This may seem like an unnecessary thing to repeat, however, since we try to use session-based
+    # authentication whenever possible, we want to ensure we are refreshing that active session before
+    # any critical work needs to be done to help minimize authentication issues in the middle of work
+    user = qualysApiUser()
+
+    # This returns just the first row of the dataframe, which will be the header row
+    header = list(df)
+
+    # Now compare the required fields to the given fields
+    missing = validateHeaders(user.REQUIRED_FIELDS, header)
+    if not missing:
+        print(f"ERROR: {df[1]} is missing one more required fields! Please add the following headers to your CSV:")
+        print(", ".join(missing))
+        return False
+
+    user_dicts = df.to_dict(orient="records")
+    i = 0
+    errors = 0
+    successes = 0
+    while i < len(user_dicts):
+        user_details = user_dicts[i]
+        result = user.addUser(user_details=user_details)
+        if not result:
+            errors += 1
+        else:
+            successes += 1
+        i += 1
+
+    if errors > 0:
+        print(f"{errors} users were not able to be created! Please check their details for accuracy!")
+        print(", ".join(user.failed_users))
+    
+    if successes > 0:
+        print(f"{successes} users were created successfully!")
+        print(", ".join(user.successful_users))
+
+def createAndTag(df):
+    pass
+
 def printVersion():
     """
         This function is used in the argparse library to print the current version of this application
     """
-    print("qsc_automation.py 0.1.3")
+    print("qsc_automation.py 0.1.4")
     print("This is free software: you are free to change and redistribute it.")
     print("There is NO WARRANTY, to the extent permitted by law.\n")
     print("Written by Benjamin Owen; see below for original code")
@@ -70,6 +110,8 @@ def main():
     parser.add_argument("--version", action="store_true", required=False, help="show this program's current version")
     parser.add_argument("-f", "--file", nargs="+", required=False)
     parser.add_argument("-t", "--test", action="store_true", required=False, help="Test the API using the credentials on file before taking any actions")
+    parser.add_argument("-c", "--create", action="store_true", required=False, help="Create users in the provided CSV file")
+    parser.add_argument("-a", "--create-and-tag", action="store_true", required=False, help="Create users in the provided CSV, create a Global Asset Tag with child tags and tag all users and hosts")
     args = parser.parse_args()
 
     if len(sys.argv) == 1:
@@ -100,51 +142,35 @@ def main():
                     dataframes.append([result, f])
 
         print(f"Remaining files to use: {args.file}")
-
-        if len(args.file) > 0:
-            for df in dataframes:
-                # This may seem like an unnecessary thing to repeat, however, since we try to use session-based
-                # authentication whenever possible, we want to ensure we are refreshing that active session before
-                # any critical work needs to be done to help minimize authentication issues in the middle of work
-                user = qualysApiUser()
-
-                # This returns just the first row of the dataframe, which will be the header row
-                header = list(df[0])
-
-                # Now compare the required fields to the given fields
-                missing = validateHeaders(user.REQUIRED_FIELDS, header)
-                if not missing:
-                    print(f"ERROR: {df[1]} is missing one more required fields! Please add the following headers to your CSV:")
-                    print(", ".join(missing))
-                    continue
-
-                user_dicts = df[0].to_dict(orient="records")
-                i = 0
-                errors = 0
-                successes = 0
-                while i < len(user_dicts):
-                    user_details = user_dicts[i]
-                    result = user.addUser(user_details=user_details)
-                    if not result:
-                        errors += 1
-                    else:
-                        successes += 1
-                    i += 1
-
-                if errors > 0:
-                    print(f"{errors} users were not able to be created! Please check their details for accuracy!")
-                    print(", ".join(user.failed_users))
-                
-                if successes > 0:
-                    print(f"{successes} users were created successfully!")
-                    print(", ".join(user.successful_users))
-
-        else:
-            print("No files remain to be parsed! Exiting...")
-            exit(0)
     else:
         parser.print_help()
         parser.exit()
+
+    if len(dataframes) > 0:
+        if args.create:
+            # loop over df
+            # create each user
+            # done
+            for df in dataframes:
+                data = df[0]
+                filename = df[1]
+
+                create(data)
+        elif args.create_and_tag:
+            # loop over df
+            # create each user
+            # create global tag if needed
+            # create child tags using usernames
+            # tag all usernames with child tags
+            # tag all assets with child tags
+            # done
+            pass
+        else:
+            parser.print_help()
+            parser.exit()
+    else:
+        print("No files remain to be parsed! Exiting...")
+        exit(0)
 
 if __name__ == "__main__":
     main()
