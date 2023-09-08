@@ -84,7 +84,41 @@ class qualysApiAssetTag():
             This method is used to create the GLOBAL_TAG Asset Tag with all of the required
             child tags.
         """
-        pass
+        endpoint = f"/qps/rest/2.0/create/am/tag"
+        url = self._auth.SCHEME + self._auth.BASE_URL + endpoint
+        self.headers["Content-Type"] = "text/xml"
+        payload = {
+            'ServiceRequest': {
+                'data': {
+                    'Tag': {
+                        'name': self.GLOBAL_TAG,
+                        'children': {
+                            'set': {
+                                'TagSimple': []
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        for tag in tags:
+            t = {'name': tag}
+            payload['ServiceRequest']['data']['Tag']['children']['set']['TagSimple'].append(t)
+
+        basic = requests.auth.HTTPBasicAuth(self._auth._username, self._auth._password)
+        r = requests.post(url=url, headers=self.headers, data=xmltodict.unparse(payload, full_document=False), auth=basic)
+        if r.status_code == 200:
+            xml = qualysApiXmlParser(r.text)
+            result = xml.parseTagCreateReturn()
+            if not result:
+                print(f"ERROR: Unable to create the Global Asset Tag! URL: {url} :: Response Code: {r.status_code} :: Headers: {r.headers} :: Details: {r.text}")
+                return False
+            else:
+                return True
+        else:
+            print(f"ERROR: Unable to create the Global Asset Tag! URL: {url} :: Response Code: {r.status_code} :: Headers: {r.headers} :: Details: {r.text}")
+            return False
 
     def updateGlobalTag(self, tags):
         """
@@ -94,6 +128,7 @@ class qualysApiAssetTag():
         """
         endpoint = f"/qps/rest/2.0/update/am/tag/{self.global_tag_id}"
         url = self._auth.SCHEME + self._auth.BASE_URL + endpoint
+        self.headers["Content-Type"] = "text/xml"
         payload = {
             'ServiceRequest': {
                 'data': {
@@ -122,3 +157,6 @@ class qualysApiAssetTag():
                 return False
             else:
                 return True
+        else:
+            print(f"ERROR: Unable to update the Global Asset Tag! URL: {url} :: Response Code: {r.status_code} :: Headers: {r.headers} :: Details: {r.text}")
+            return False
