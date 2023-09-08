@@ -61,3 +61,43 @@ class qualysApiXmlParser():
             message = self.xml_data["USER_OUTPUT"]["RETURN"]["MESSAGE"]
             username = re.search(r"^(?P<username>[a-z0-9]+)\s+user\s+has", message)
             return username
+
+    def parseTagSearchReturn(self):
+        """
+            This method is used to parse the XML Output of the
+            Qualys API Asset Tag Search call to determine if the Asset Tag
+            exists and return it's ID or return -1
+        """
+        tag_id = -1
+        count = int(self.xml_data["ServiceResponse"]["count"])
+
+        if count >= 1:
+            tag_id = int(self.xml_data["ServiceResponse"]["data"]["Tag"]["id"])
+
+        return tag_id
+
+    def parseTagCreateReturn(self):
+        """
+            This method is used to parse the XML Output of the
+            Qualys API Asset Tag Create call to determine if the Global Asset Tag
+            and all of it's child tags were created successfully
+        """
+        status = self.xml_data["ServiceResponse"]["responseCode"]
+
+        if status == "SUCCESS":
+            return True
+        else:
+            return False
+
+    def parseTagUpdateReturn(self):
+        """
+            This method is used to parse the XML Output of the 
+            Qualys API Asset Tag Update call to determine if the Global Asset Tag
+            was updated successfully with all given child tags
+        """
+        status = self.xml_data["ServiceResponse"]["responseCode"]
+
+        if status == "SUCCESS":
+            return True
+        else:
+            return False
