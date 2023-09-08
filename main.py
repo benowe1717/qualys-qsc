@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from auth import qualysApiAuth
+from asset_tag import qualysApiAssetTag
 from user import qualysApiUser
 from pandas.errors import ParserError
 import argparse, os, sys
@@ -42,8 +43,24 @@ def create(df):
         print(f"{successes} users were created successfully!")
         print(", ".join(user.successful_users))
 
+    return user
+
 def createAndTag(df):
-    pass
+    user = create(df)
+    tagging = qualysApiAssetTag()
+
+    result = tagging.searchTags()
+    if result and tagging.global_tag_id != -1:
+        tagging.updateGlobalTag(user.users_to_tag)
+    else:
+        tagging.createGlobalTag(user.users_to_tag)
+
+    for username in user.users_to_tag:
+        userid = user.searchUser(username)
+
+        if userid != -1:
+            tagging.tagUser(userid, username)
+            exit(0)
 
 def printVersion():
     """
@@ -164,7 +181,11 @@ def main():
             # tag all usernames with child tags
             # tag all assets with child tags
             # done
-            pass
+            for df in dataframes:
+                data = df[0]
+                filename = df[1]
+
+                createAndTag(data)
         else:
             parser.print_help()
             parser.exit()

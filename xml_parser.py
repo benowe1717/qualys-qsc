@@ -59,8 +59,8 @@ class qualysApiXmlParser():
             return False
         elif status == "SUCCESS":
             message = self.xml_data["USER_OUTPUT"]["RETURN"]["MESSAGE"]
-            username = re.search(r"^(?P<username>[a-z0-9]+)\s+user\s+has", message)
-            return username
+            search = re.search(r"^(?P<username>[a-z0-9]+)\s+user\s+has", message)
+            return search["username"]
 
     def parseTagSearchReturn(self):
         """
