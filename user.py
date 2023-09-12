@@ -3,7 +3,7 @@ import constants
 from auth import qualysApiAuth
 from xml_parser import qualysApiXmlParser
 from urllib.parse import quote
-import os, requests, yaml
+import os, requests, time, xmltodict, yaml
 
 class qualysApiUser():
     """
@@ -53,6 +53,43 @@ class qualysApiUser():
         # right out of the gate. If there are any problems authenticating, it will die right here.
         # Otherwise, we continue as normal
         self._auth = qualysApiAuth()
+
+    def _callApi(self, endpoint, payload=None, request_type=None):
+        """
+            This method is here to make the network call to the Qualys API
+            and serves as a repeatable point of entry to that API.
+            param: endpoint
+            type: string
+            sampe: /path/to/api/endpoint
+
+            param: payload
+            type: string/dict
+            sample: param1=this&param2=that
+            sample: {'param1': 'this', 'param2': 'that'}
+
+            param: request_type
+            type: string
+            this is either "params" or "xml"
+
+            output: dict/boolean
+            result: either a dict from xmltodict library on success or
+                    False on failure
+        """
+        url = self._auth.SCHEME + self._auth.BASE_URL + endpoint
+        basic = requests.auth.HTTPBasicAuth(self._auth._username, self._auth._password)
+        if payload:
+            if request_type == "params":
+                r = requests.post(url=url, headers=self.headers, data=payload, auth=basic)
+            elif request_type == "xml":
+                self.headers["Content-Type"] = "text/xml"
+                r = requests.post(url=url, headers=self.headers, data=xmltodict.unparse(payload), auth=basic)
+        else:
+            r = requests.get(url=url, headers=self.headers, auth=basic)
+        if r.status_code == 200:
+            return r.text
+        else:
+            print(f"ERROR: Qualys API Call failed! URL: {url} :: Response Code: {r.status_code} :: Headers: {r.headers} :: Details: {r.text}")
+            return False
 
     def validateCountryCode(self, country_code):
         """
@@ -106,7 +143,6 @@ class qualysApiUser():
         action = "add"
         send_email = 1
         endpoint = "/msp/user.php"
-        url = self._auth.SCHEME + self._auth.BASE_URL + endpoint
         payload = f"action={action}&send_email={send_email}"
 
         # First, validate the Country Code
@@ -129,20 +165,72 @@ class qualysApiUser():
             payload = payload + f"&{key}={value}"
             if key == "email":
                 email = value
-        basic = requests.auth.HTTPBasicAuth(self._auth._username, self._auth._password)
-        r = requests.post(url=url, headers=self.headers, data=payload, auth=basic)
-        if r.status_code == 200:
-            xml = qualysApiXmlParser(r.text)
-            result = xml.parseUserReturn()
-            if not result:
+        result = self._callApi(endpoint, payload, "params")
+        if not result:
+            self.failed_users.append(email)
+            return False
+        else:
+            self.successful_users.append(email)
+            xml = qualysApiXmlParser(result)
+            username = xml.parseUserReturn()
+            if not username:
                 print(f"ERROR: Unable to create User {email}! URL: {url} :: Response Code: {r.status_code} :: Headers: {r.headers} :: Details: {xml.err_msg}")
                 self.failed_users.append(email)
                 return False
             else:
-                self.successful_users.append(email)
-                self.users_to_tag.append(result)
+                self.users_to_tag.append(username)
                 return True
+
+    def searchUser(self, username):
+        """
+            https://docs.qualys.com/en/admin/api/#t=rbac_apis%2Fsearch_user_list_based_on_id_name_and_rolename.htm
+            This method takes a given username (text) and searches the
+            user list in the Qualys instance and checks to see if the
+            username exists, and if it does exist, returns an id, otherwise
+            returns -1. In pretty much every case this should return an id.
+
+            param: username
+            type: string
+            sample: quays6bw
+
+            output: integer
+            result: 123456 or -1
+        """
+        endpoint = "/qps/rest/2.0/search/am/user/"
+        payload = {
+            'ServiceRequest': {
+                'filters': {
+                    'Criteria': {
+                        '@field': "username",
+                        '@operator': "EQUALS",
+                        '#text': username
+                    }
+                },
+                'preferences': {
+                    'limitResults': {
+                        '#text': "10"
+                    }
+                }
+            }
+        }
+        result = self._callApi(endpoint, payload, "xml")
+        if not result:
+            return -1
         else:
-            print(f"ERROR: Unable to create User {email}! URL: {url} :: Response Code: {r.status_code} :: Headers: {r.headers} :: Details: {r.text}")
-            self.failed_users.append(email)
-            return False
+            xml = qualysApiXmlParser(result)
+            if xml.xml_data["ServiceResponse"]["responseCode"] == "SUCCESS":
+                count = int(xml.xml_data["ServiceResponse"]["count"])
+                while count < 1:
+                    print(f"ERROR: Unable to locate the User's ID! This is probably because the user was just created, sleeping for 10s and trying again...")
+                    print(xml.xml_data)
+                    time.sleep(10)
+                    result = self._callApi(endpoint, payload, "xml")
+                    if not result:
+                        return -1
+                    else:
+                        xml = qualysApiXmlParser(result)
+                        count = int(xml.xml_data["ServiceResponse"]["count"])
+                userid = int(xml.xml_data["ServiceResponse"]["data"]["User"]["id"])
+                return userid
+            else:
+                return -1
