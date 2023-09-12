@@ -8,9 +8,13 @@ With these accounts provisioned, many customer accounts can be created and distr
 
 Before you begin, ensure you have met the following requirements:
 
-- If any dependencies need to be installed ahead of time, list them here and include links to them
-- List all supported Operating Systems
-- Link to any external documentation that covers prerequisite information
+- Install all requirements from `requirements.txt` in the Installing section
+- Supported Operating Systems:
+  - Debian 11/12
+  - Ubuntu 20.04/22.04 LTS
+  - Zorin OS 16+
+- Supported Python3 versions:
+  - Python 3.8.10+
 
 ## Installing
 
