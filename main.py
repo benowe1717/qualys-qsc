@@ -55,12 +55,32 @@ def createAndTag(df):
     else:
         tagging.createGlobalTag(user.users_to_tag)
 
+    failed_tags = []
+    tags = []
+    errors = 0
+    successes = 0
     for username in user.users_to_tag:
         userid = user.searchUser(username)
 
         if userid != -1:
-            tagging.tagUser(userid, username)
-            exit(0)
+            result = tagging.tagUser(userid, username)
+            if result:
+                tags.append(username)
+                successes += 1
+            else:
+                errors += 1
+                failed_tags.append(username)
+        else:
+            errors += 1
+            failed_tags.append(username)
+
+    if errors > 0:
+        print(f"{errors} users were not able to be tagged!")
+        print(", ".join(failed_tags))
+    
+    if successes > 0:
+        print(f"{successes} users were tagged successfully!")
+        print(", ".join(tags))
 
 def printVersion():
     """

@@ -3,7 +3,7 @@ import constants
 from auth import qualysApiAuth
 from xml_parser import qualysApiXmlParser
 from urllib.parse import quote
-import os, requests, xmltodict, yaml
+import os, requests, time, xmltodict, yaml
 
 class qualysApiUser():
     """
@@ -54,7 +54,7 @@ class qualysApiUser():
         # Otherwise, we continue as normal
         self._auth = qualysApiAuth()
 
-    def _callApi(self, endpoint, payload, request_type):
+    def _callApi(self, endpoint, payload=None, request_type=None):
         """
             This method is here to make the network call to the Qualys API
             and serves as a repeatable point of entry to that API.
@@ -77,11 +77,14 @@ class qualysApiUser():
         """
         url = self._auth.SCHEME + self._auth.BASE_URL + endpoint
         basic = requests.auth.HTTPBasicAuth(self._auth._username, self._auth._password)
-        if request_type == "params":
-            r = requests.post(url=url, headers=self.headers, data=payload, auth=basic)
-        elif request_type == "xml":
-            self.headers["Content-Type"] = "text/xml"
-            r = requests.post(url=url, headers=self.headers, data=xmltodict.unparse(payload, full_document=False), auth=basic)
+        if payload:
+            if request_type == "params":
+                r = requests.post(url=url, headers=self.headers, data=payload, auth=basic)
+            elif request_type == "xml":
+                self.headers["Content-Type"] = "text/xml"
+                r = requests.post(url=url, headers=self.headers, data=xmltodict.unparse(payload), auth=basic)
+        else:
+            r = requests.get(url=url, headers=self.headers, auth=basic)
         if r.status_code == 200:
             return r.text
         else:
@@ -181,8 +184,9 @@ class qualysApiUser():
     def searchUser(self, username):
         """
             https://docs.qualys.com/en/admin/api/#t=rbac_apis%2Fsearch_user_list_based_on_id_name_and_rolename.htm
-            This method takes a given username (text) and searches the user list in the Qualys instance
-            and checks to see if the username exists, and if it does exist, returns an id, otherwise
+            This method takes a given username (text) and searches the
+            user list in the Qualys instance and checks to see if the
+            username exists, and if it does exist, returns an id, otherwise
             returns -1. In pretty much every case this should return an id.
 
             param: username
@@ -198,11 +202,13 @@ class qualysApiUser():
                 'filters': {
                     'Criteria': {
                         '@field': "username",
-                        'operator': "EQUALS",
+                        '@operator': "EQUALS",
                         '#text': username
-                    },
-                    'preferences': {
-                        'limitResults': 10
+                    }
+                },
+                'preferences': {
+                    'limitResults': {
+                        '#text': "10"
                     }
                 }
             }
@@ -211,4 +217,20 @@ class qualysApiUser():
         if not result:
             return -1
         else:
-            return result
+            xml = qualysApiXmlParser(result)
+            if xml.xml_data["ServiceResponse"]["responseCode"] == "SUCCESS":
+                count = int(xml.xml_data["ServiceResponse"]["count"])
+                while count < 1:
+                    print(f"ERROR: Unable to locate the User's ID! This is probably because the user was just created, sleeping for 10s and trying again...")
+                    print(xml.xml_data)
+                    time.sleep(10)
+                    result = self._callApi(endpoint, payload, "xml")
+                    if not result:
+                        return -1
+                    else:
+                        xml = qualysApiXmlParser(result)
+                        count = int(xml.xml_data["ServiceResponse"]["count"])
+                userid = int(xml.xml_data["ServiceResponse"]["data"]["User"]["id"])
+                return userid
+            else:
+                return -1

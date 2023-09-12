@@ -3,7 +3,7 @@ import constants
 from auth import qualysApiAuth
 from xml_parser import qualysApiXmlParser
 from urllib.parse import quote
-import os, requests, xmltodict, yaml
+import os, requests, time, xmltodict, yaml
 
 class qualysApiAssetTag():
     """
@@ -178,6 +178,12 @@ class qualysApiAssetTag():
         return False
 
     def tagUser(self, userid, tagname):
+        """
+            https://docs.qualys.com/en/admin/api/#t=rbac_apis%2Fupdate_user_tags_and_roles.htm
+            This method takes a userid and a tagname and calls the Qualys
+            Update User Tags API call and assigns the given tagname to the
+            userid
+        """
         endpoint = f"/qps/rest/2.0/update/am/user/{userid}"
         self.headers["Content-Type"] = "text/xml"
         payload = {
@@ -199,7 +205,9 @@ class qualysApiAssetTag():
         result = self._callApi(endpoint, payload, "xml")
         if result:
             xml = qualysApiXmlParser(result)
-            print(result)
+            tag_result = xml.parseTagUserReturn()
+            if tag_result:
+                return True
         return False
 
     def tagAsset(self, assetname):
