@@ -73,8 +73,14 @@ class qualysApiXmlParser():
 
         if count >= 1:
             tag_id = int(self.xml_data["ServiceResponse"]["data"]["Tag"]["id"])
+            child_tags = []
+            for item in self.xml_data["ServiceResponse"]["data"]["Tag"]["children"]["list"]["TagSimple"]:
+                child_tagid = item["id"]
+                child_tagname = item["name"]
+                child_tagdict = {child_tagid: {'name': child_tagname}}
+                child_tags.append(child_tagdict)
 
-        return tag_id
+        return [tag_id, child_tags]
 
     def parseTagCreateReturn(self):
         """
@@ -107,6 +113,19 @@ class qualysApiXmlParser():
             This method is used to parse the XML Output of the
             Qualys API Update User Tags call to determine if a given
             asset tag was properly assigned to a user
+        """
+        status = self.xml_data["ServiceResponse"]["responseCode"]
+
+        if status == "SUCCESS":
+            return True
+        else:
+            return False
+
+    def parseTagAssetReturn(self):
+        """
+            This method is used to parse the XML Output of the
+            Qualys API Update Asset call to determine if a given
+            asset tag was applied to an asset
         """
         status = self.xml_data["ServiceResponse"]["responseCode"]
 
