@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
+import constants
 from auth import qualysApiAuth
 from asset_tag import qualysApiAssetTag
 from user import qualysApiUser
+from asset import qualysApiAsset
 from pandas.errors import ParserError
 import argparse, os, sys
 import pandas as pd
@@ -54,9 +56,11 @@ def createAndTag(df):
         tagging.updateGlobalTag(user.users_to_tag)
     else:
         tagging.createGlobalTag(user.users_to_tag)
+    result = tagging.searchTags()
+    tags = tagging.child_tags
 
     failed_tags = []
-    tags = []
+    successful_tags = []
     errors = 0
     successes = 0
     for username in user.users_to_tag:
@@ -65,7 +69,7 @@ def createAndTag(df):
         if userid != -1:
             result = tagging.tagUser(userid, username)
             if result:
-                tags.append(username)
+                successful_tags.append(username)
                 successes += 1
             else:
                 errors += 1
@@ -80,13 +84,47 @@ def createAndTag(df):
     
     if successes > 0:
         print(f"{successes} users were tagged successfully!")
-        print(", ".join(tags))
+        print(", ".join(successful_tags))
+
+    asset = qualysApiAsset()
+    asset.searchAssets(constants.NEEDLE)
+
+    i = 0
+    errors = 0
+    successes = 0
+    failed_assets = []
+    successful_assets = []
+    count = len(asset.assets_to_tag)
+    if count > 0:
+        while i < count:
+            for key, value in asset.assets_to_tag[i].items():
+                assetid = key
+                assetname = value["name"]
+            for key, value in tags[i].items():
+                tagid = key
+                tagname = value["name"]
+            result = tagging.tagAsset(assetid, tagid)
+            if result:
+                successes += 1
+                successful_assets.append(assetname)
+            else:
+                errors += 1
+                failed_assets.append(assetname)
+            i += 1
+
+    if errors > 0:
+        print(f"{errors} assets were not able to be tagged!")
+        print(", ".join(failed_assets))
+
+    if successes > 0:
+        print(f"{errors} assets were were tagged successfully!")
+        print(", ".join(successful_assets))
 
 def printVersion():
     """
         This function is used in the argparse library to print the current version of this application
     """
-    print("qsc_automation.py 0.1.4")
+    print("qsc_automation.py 0.1.5")
     print("This is free software: you are free to change and redistribute it.")
     print("There is NO WARRANTY, to the extent permitted by law.\n")
     print("Written by Benjamin Owen; see below for original code")
@@ -98,7 +136,7 @@ def readCsv(filename):
         1) Test if the file is in fact a CSV file and 
         2) Read the data from a CSV file into a pandas dataframe
     """
-    decoders = ["ISO-8859-1", "utf-8", "unicode_escape"]
+    decoders = constants.DECODERS
     try:
         df = pd.read_csv(filename)
         return df

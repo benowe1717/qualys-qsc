@@ -64,7 +64,7 @@ VALID_IN_STATES = [
     "Chandigarh", "Chattisgarh", "Dadra and Nagar Haveli", "Daman and Diu", "Delhi", "Goa", "Gujarat", "Haryana",
     "Himachal Pradesh", "Jammu and Kashmir", "Jharkhand", "Karnataka", "Kerala", "Lakshadadweep",
     "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Orissa", "Pondicherry",
-    "Punjab", "Rajasthan","Sikkim", "Tamil Nadu", "Tripura", "Uttar Pradesh", "Uttaranchal", "West Bengal", "No State"
+    "Punjab", "Rajasthan","Sikkim", "Tamil Nadu", "Tripura", "Uttar Pradesh", "Uttaranchal", "West Bengal"
 ]
 
 REQUIRED_FIELDS = [
@@ -72,3 +72,7 @@ REQUIRED_FIELDS = [
 ]
 
 GLOBAL_TAG = "QSC"
+NEEDLE = "EC2"
+DECODERS = [
+    "ISO-8859-1", "utf-8", "unicode_escape"
+]

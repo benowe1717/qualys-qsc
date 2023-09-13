@@ -37,6 +37,7 @@ class qualysApiAssetTag():
     ######################
     headers = {"X-Requested-With": "Python3Requests", "Content-Type": "application/x-www-form-urlencoded"}
     global_tag_id = -1
+    child_tags = []
 
     def __init__(self):
         # Instantiate the qualysApiAuth() class, which will run all the required authentication checks
@@ -71,10 +72,11 @@ class qualysApiAssetTag():
             r = requests.post(url=url, headers=self.headers, data=payload, auth=basic)
         elif request_type == "xml":
             self.headers["Content-Type"] = "text/xml"
-            r = requests.post(url=url, headers=self.headers, data=xmltodict.unparse(payload, full_document=False), auth=basic)
+            r = requests.post(url=url, headers=self.headers, data=xmltodict.unparse(payload), auth=basic)
         if r.status_code == 200:
             return r.text
         else:
+            print(xmltodict.unparse(payload))
             print(f"ERROR: Qualys API Call failed! URL: {url} :: Response Code: {r.status_code} :: Headers: {r.headers} :: Details: {r.text}")
             return False
 
@@ -102,9 +104,10 @@ class qualysApiAssetTag():
         result = self._callApi(endpoint, payload, "xml")
         if result:
             xml = qualysApiXmlParser(result)
-            tag_id = xml.parseTagSearchReturn()
-            if result != -1:
-                self.global_tag_id = tag_id
+            search_result = xml.parseTagSearchReturn()
+            if search_result[0] != -1:
+                self.global_tag_id = search_result[0]
+                self.child_tags = search_result[1]
             return True
         return False
 
@@ -174,7 +177,7 @@ class qualysApiAssetTag():
             xml = qualysApiXmlParser(result)
             update_result = xml.parseTagUpdateReturn()
             if update_result:
-                return True
+                return update_result
         return False
 
     def tagUser(self, userid, tagname):
@@ -210,5 +213,39 @@ class qualysApiAssetTag():
                 return True
         return False
 
-    def tagAsset(self, assetname):
-        pass
+    def tagAsset(self, assetid, tagid):
+        """
+            https://www.qualys.com/docs/qualys-asset-management-tagging-api-v2-user-guide.pdf :: Page 135
+            This method takes a given assetid and tagid and updates the
+            asset with the given tagid
+        """
+        endpoint = "/qps/rest/2.0/update/am/asset"
+        payload = {
+            'ServiceRequest': {
+                'filters': {
+                    'Criteria': {
+                        '@field': "id",
+                        '@operator': "EQUALS",
+                        '#text': str(assetid)
+                    }
+                },
+                'data': {
+                    'Asset': {
+                        'tags': {
+                            'add': {
+                                'TagSimple': {
+                                    'id': tagid
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        result = self._callApi(endpoint, payload, "xml")
+        if result:
+            xml = qualysApiXmlParser(result)
+            tag_result = xml.parseTagAssetReturn()
+            if tag_result:
+                return True
+        return False
