@@ -44,6 +44,7 @@ class qualysApiUser():
     ### PUBLIC OBJECTS ###
     ######################
     headers = {"X-Requested-With": "Python3Requests", "Content-Type": "application/x-www-form-urlencoded"}
+    current_users = []
     failed_users = []
     successful_users = []
     users_to_tag = []
@@ -122,6 +123,25 @@ class qualysApiUser():
                 return True
         return False
 
+    def listUsers(self):
+        """
+            https://docs.qualys.com/en/vm/api/users/index.htm#t=users%2Flist_users.htm
+            This method lists all users in the current subscription and
+            adds each email address to the self.current_users list which
+            will be used to verify if duplicate users are going to be created
+        """
+        endpoint = "/msp/user_list.php"
+        result = self._callApi(endpoint)
+        if result:
+            xml = qualysApiXmlParser(result)
+            for user in xml.xml_data["USER_LIST_OUTPUT"]["USER_LIST"]["USER"]:
+                email = user["CONTACT_INFO"]["EMAIL"]
+                if email not in self.current_users:
+                    self.current_users.append(email)
+        else:
+            print(f"ERROR: Unable to get user list!")
+            exit(1)
+
     def addUser(self, user_details):
         """
             https://www.qualys.com/docs/qualys-api-vmpc-user-guide.pdf#G17.783431
@@ -144,6 +164,13 @@ class qualysApiUser():
         send_email = 1
         endpoint = "/msp/user.php"
         payload = f"action={action}&send_email={send_email}"
+
+        users = set(self.current_users)
+        if user_details["email"] in users:
+            print(f"ERROR: User's email address: {user_details['email']} is a duplicate!")
+            dup_user = f"{user_details['email']} {user_details['first_name']} {user_details['last_name']}"
+            self.failed_users.append(dup_user)
+            return False
 
         # First, validate the Country Code
         if not self.validateCountryCode(user_details["country"]):
@@ -171,6 +198,7 @@ class qualysApiUser():
             return False
         else:
             self.successful_users.append(email)
+            self.current_users.append(email)
             xml = qualysApiXmlParser(result)
             username = xml.parseUserReturn()
             if not username:
