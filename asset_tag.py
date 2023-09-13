@@ -76,7 +76,6 @@ class qualysApiAssetTag():
         if r.status_code == 200:
             return r.text
         else:
-            print(xmltodict.unparse(payload))
             print(f"ERROR: Qualys API Call failed! URL: {url} :: Response Code: {r.status_code} :: Headers: {r.headers} :: Details: {r.text}")
             return False
 
