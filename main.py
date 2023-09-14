@@ -60,25 +60,27 @@ def createAndTag(df):
     result = tagging.searchTags()
     tags = tagging.child_tags
 
-    failed_roles = []
-    successful_roles = []
     failed_tags = []
     successful_tags = []
-    role_errors = 0
-    role_successes = 0
     tag_errors = 0
     tag_successes = 0
     for username in user.users_to_tag:
         userid = user.searchUser(username)
 
         if userid != -1:
-            result = user.applyRoleToUser(userid)
-            if result:
-                role_successes += 1
-                successful_roles.append(username)
-            else:
-                role_errors += 1
-                failed_roles.append(username)
+            role_errors = 0
+            role_successes = 0
+            failed_roles = []
+            successful_roles = []
+            
+            for role in constants.ROLES:
+                result = user.applyRoleToUser(userid, role)
+                if result:
+                    role_successes += 1
+                    successful_roles.append(role)
+                else:
+                    role_errors += 1
+                    failed_roles.append(role)
 
             result = tagging.tagUser(userid, username)
             if result:
@@ -90,16 +92,16 @@ def createAndTag(df):
         else:
             role_errors += 1
             tag_errors += 1
-            failed_roles.append(username)
+            failed_roles.append(role for role in constants.ROLES)
             failed_tags.append(username)
 
-    if role_errors > 0:
-        print(f"{role_errors} users were not able to be assigned a role!")
-        print(", ".join(failed_roles))
+        if role_errors > 0:
+            print(f"{role_errors} roles were not able to be assigned to {username}!")
+            print(", ".join(failed_roles))
 
-    if role_successes > 0:
-        print(f"{role_successes} users were assigned roles successfully!")
-        print(", ".join(successful_roles))
+        if role_successes > 0:
+            print(f"{role_successes} roles were assigned successfully to {username}!")
+            print(", ".join(successful_roles))
 
     if tag_errors > 0:
         print(f"{tag_errors} users were not able to be tagged!")
