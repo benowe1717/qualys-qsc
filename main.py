@@ -62,29 +62,53 @@ def createAndTag(df):
 
     failed_tags = []
     successful_tags = []
-    errors = 0
-    successes = 0
+    tag_errors = 0
+    tag_successes = 0
     for username in user.users_to_tag:
         userid = user.searchUser(username)
 
         if userid != -1:
+            role_errors = 0
+            role_successes = 0
+            failed_roles = []
+            successful_roles = []
+            
+            for role in constants.ROLES:
+                result = user.applyRoleToUser(userid, role)
+                if result:
+                    role_successes += 1
+                    successful_roles.append(role)
+                else:
+                    role_errors += 1
+                    failed_roles.append(role)
+
             result = tagging.tagUser(userid, username)
             if result:
+                tag_successes += 1
                 successful_tags.append(username)
-                successes += 1
             else:
-                errors += 1
+                tag_errors += 1
                 failed_tags.append(username)
         else:
-            errors += 1
+            role_errors += 1
+            tag_errors += 1
+            failed_roles.append(role for role in constants.ROLES)
             failed_tags.append(username)
 
-    if errors > 0:
-        print(f"{errors} users were not able to be tagged!")
+        if role_errors > 0:
+            print(f"{role_errors} roles were not able to be assigned to {username}!")
+            print(", ".join(failed_roles))
+
+        if role_successes > 0:
+            print(f"{role_successes} roles were assigned successfully to {username}!")
+            print(", ".join(successful_roles))
+
+    if tag_errors > 0:
+        print(f"{tag_errors} users were not able to be tagged!")
         print(", ".join(failed_tags))
     
-    if successes > 0:
-        print(f"{successes} users were tagged successfully!")
+    if tag_successes > 0:
+        print(f"{tag_successes} users were tagged successfully!")
         print(", ".join(successful_tags))
 
     asset = qualysApiAsset()

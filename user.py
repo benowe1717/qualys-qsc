@@ -262,3 +262,37 @@ class qualysApiUser():
                 return userid
             else:
                 return -1
+
+    def applyRoleToUser(self, userid, rolename):
+        """
+            https://docs.qualys.com/en/admin/api/#t=rbac_apis%2Fupdate_user_tags_and_roles.htm
+            This method takes a given user id and a given role name and
+            applies the role to the user. This ensures that the created user
+            has the right permissions within the Qualys subscription.
+        """
+        endpoint = f"/qps/rest/2.0/update/am/user/{userid}"
+        payload = {
+            'ServiceRequest': {
+                'data': {
+                    'User': {
+                        'roleList': {
+                            'add': {
+                                'RoleData': {
+                                    'name': {
+                                        '#text': rolename
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        result = self._callApi(endpoint, payload, "xml")
+        if result:
+            xml = qualysApiXmlParser(result)
+            role_result = xml.parseRoleAssignResult()
+            if role_result:
+                return True
+        return False

@@ -133,3 +133,16 @@ class qualysApiXmlParser():
             return True
         else:
             return False
+
+    def parseRoleAssignResult(self):
+        """
+            This method is used to parse the XML Output of the
+            Qualys API Update User call to determine if a given
+            role/set of roles was applied to a user
+        """
+        status = self.xml_data["ServiceResponse"]["responseCode"]
+
+        if status == "SUCCESS":
+            return True
+        else:
+            return False
