@@ -76,3 +76,7 @@ NEEDLE = "EC2"
 DECODERS = [
     "ISO-8859-1", "utf-8", "unicode_escape"
 ]
+
+ROLES = [
+    "CSAM User", "PATCH USER"
+]
