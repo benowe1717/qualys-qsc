@@ -134,7 +134,7 @@ class qualysApiAssetTag():
         }
 
         for tag in tags:
-            t = {'name': tag}
+            t = {'name': f"{constants.TAG_NAME}{tag}"}
             payload['ServiceRequest']['data']['Tag']['children']['set']['TagSimple'].append(t)
 
         result = self._callApi(endpoint, payload, "xml")
@@ -168,7 +168,7 @@ class qualysApiAssetTag():
         }
 
         for tag in tags:
-            t = {'name': tag}
+            t = {'name': f"{constants.TAG_NAME}{tag}"}
             payload['ServiceRequest']['data']['Tag']['children']['set']['TagSimple'].append(t)
 
         result = self._callApi(endpoint, payload, "xml")

@@ -119,15 +119,33 @@ def createAndTag(df):
     successes = 0
     failed_assets = []
     successful_assets = []
-    count = len(asset.assets_to_tag)
-    if count > 0:
-        while i < count:
-            for key, value in asset.assets_to_tag[i].items():
+
+    tag_count = len(tags)
+    asset_count = len(asset.assets_to_tag)
+
+    if tag_count > asset_count:
+        asset_list = asset.assets_to_tag
+        tag_list = tags[:asset_count]
+        working_count = asset_count
+    elif asset_count > tag_count:
+        asset_list = asset.assets_to_tag[:tag_count]
+        tag_list = tags
+        working_count = tag_count
+    else:
+        asset_list = asset.assets_to_tag
+        tag_list = tags
+        working_count = asset_count
+
+    if working_count > 0:
+        while i < working_count:
+            for key, value in asset_list[i].items():
                 assetid = key
                 assetname = value["name"]
-            for key, value in tags[i].items():
+
+            for key, value in tag_list[i].items():
                 tagid = key
                 tagname = value["name"]
+
             result = tagging.tagAsset(assetid, tagid)
             if result:
                 successes += 1
@@ -135,6 +153,7 @@ def createAndTag(df):
             else:
                 errors += 1
                 failed_assets.append(assetname)
+            
             i += 1
 
     if errors > 0:
@@ -142,14 +161,14 @@ def createAndTag(df):
         print(", ".join(failed_assets))
 
     if successes > 0:
-        print(f"{errors} assets were were tagged successfully!")
+        print(f"{successes} assets were were tagged successfully!")
         print(", ".join(successful_assets))
 
 def printVersion():
     """
         This function is used in the argparse library to print the current version of this application
     """
-    print("qsc_automation.py 0.1.6")
+    print("qsc_automation.py 0.1.7")
     print("This is free software: you are free to change and redistribute it.")
     print("There is NO WARRANTY, to the extent permitted by law.\n")
     print("Written by Benjamin Owen; see below for original code")

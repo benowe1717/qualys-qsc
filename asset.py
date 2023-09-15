@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import constants
 from auth import qualysApiAuth
 from xml_parser import qualysApiXmlParser
 from urllib.parse import quote
@@ -117,10 +118,17 @@ class qualysApiAsset():
             xml = qualysApiXmlParser(result)
             while xml.xml_data["ServiceResponse"]["responseCode"] == "SUCCESS":
                 for asset in xml.xml_data["ServiceResponse"]["data"]["Asset"]:
-                    assetid = asset["id"]
-                    assetname = asset["name"]
-                    asset_dict = {assetid: {'name': assetname}}
-                    self.assets_to_tag.append(asset_dict)
+                    do_not_tag = 0
+                    for tag in asset["tags"]["list"]["TagSimple"]:
+                        if constants.TAG_NAME in tag["name"]:
+                            do_not_tag = 1
+                    
+                    if do_not_tag == 0:
+                        assetid = asset["id"]
+                        assetname = asset["name"]
+                        asset_dict = {assetid: {'name': assetname}}
+                        self.assets_to_tag.append(asset_dict)
+
                 if xml.xml_data["ServiceResponse"]["hasMoreRecords"] == "true":
                     offset = offset + limit
                     payload["ServiceRequest"]["preferences"]["startFromOffset"] = str(offset)
