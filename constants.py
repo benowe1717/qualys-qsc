@@ -80,3 +80,5 @@ DECODERS = [
 ROLES = [
     "CSAM User", "PATCH USER"
 ]
+
+TAG_NAME = "qsc-"

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import constants
 import xmltodict, re
 
 class qualysApiXmlParser():
@@ -77,8 +78,9 @@ class qualysApiXmlParser():
             for item in self.xml_data["ServiceResponse"]["data"]["Tag"]["children"]["list"]["TagSimple"]:
                 child_tagid = item["id"]
                 child_tagname = item["name"]
-                child_tagdict = {child_tagid: {'name': child_tagname}}
-                child_tags.append(child_tagdict)
+                if constants.TAG_NAME in child_tagname:
+                    child_tagdict = {child_tagid: {'name': child_tagname}}
+                    child_tags.append(child_tagdict)
 
         return [tag_id, child_tags]
 
