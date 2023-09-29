@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import constants
-import xmltodict, re
+import xmltodict
 
 class qualysApiXmlParser():
     """
@@ -45,12 +45,6 @@ class qualysApiXmlParser():
             This method is used to parse the XML Output of the
             Qualys API User Creation call to determine if the result
             was actually successful or not
-
-            {"USER_OUTPUT": {"API": {"@name": "user.php", "@username": "yourapiusername", "@at": "1970-01-01T00:00:00Z"},
-            "RETURN": {"@status": "SUCCESS", "MESSAGE": "some_username user has been successfully created."}}}
-
-            {"USER_OUTPUT": {"API": {"@name": "user.php", "@username": "yourapiusername", "@at": "1970-01-01T00:00:00Z"},
-            "RETURN": {"@status": "FAILED", "@number": "1234", MESSAGE": "failure reason goes here"}}}
         """
         status = self.xml_data["USER_OUTPUT"]["RETURN"]["@status"]
 
@@ -59,9 +53,9 @@ class qualysApiXmlParser():
             self.err_msg = message
             return False
         elif status == "SUCCESS":
-            message = self.xml_data["USER_OUTPUT"]["RETURN"]["MESSAGE"]
-            search = re.search(r"^(?P<username>[a-z0-9]+)\s+user\s+has", message)
-            return search["username"]
+            username = self.xml_data["USER_OUTPUT"]["USER"]["USER_LOGIN"]
+            password = self.xml_data["USER_OUTPUT"]["USER"]["PASSWORD"]
+            return [username, password]
 
     def parseTagSearchReturn(self):
         """
