@@ -126,7 +126,7 @@ def createAndTag(users):
         working_count = asset_count
 
     if working_count > 0:
-        while i < working_count:
+        while i != working_count:
             for key, value in asset_list[i].items():
                 assetid = key
                 assetname = value["name"]
