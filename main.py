@@ -37,8 +37,8 @@ def create(users):
 
     return user
 
-def createAndTag(df):
-    user = create(df)
+def createAndTag(users):
+    user = create(users)
     tagging = qualysApiAssetTag()
 
     result = tagging.searchTags()
@@ -212,7 +212,13 @@ def main():
                         lines.append(result)
 
             users = [user for line in lines for user in line]
-            print(users)
+            createAndTag(users)
+
+            print(f"All users that were successfully created have been written to the {constants.OUTPUT_FILE} file.")
+            print("Please ensure that you have installed the `mailmerge` utility from the requirements.txt file")
+            print("Please also ensure that you have configured your SMTP sersver in the mailmerge_server.conf file")
+            print("And finally confirm the email template is present in the file mailmerge_template.txt")
+            print("If all looks good, you can run `mailmerge --no-limit --no-dry-run` to send out credentials to all users!")
 
 if __name__ == "__main__":
     main()
