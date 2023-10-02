@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import constants
-from helper import qualysApiHelper
-from auth import qualysApiAuth
+from requestshelper import requestsHelper
 from xml_parser import qualysApiXmlParser
 import time
 
@@ -41,7 +40,7 @@ class qualysApiUser():
     user_details = []
 
     def __init__(self):
-        self.helper = qualysApiHelper()
+        self.helper = requestsHelper()
 
     def addUser(self, user):
         """
@@ -52,7 +51,7 @@ class qualysApiUser():
             the constants file.
 
             param: users
-            type: list
+            type: string
             sample: test@test.com
         """
         action = "add"
@@ -70,6 +69,7 @@ class qualysApiUser():
             self.successful_users.append(user)
             xml = qualysApiXmlParser(result)
             user_details = xml.parseUserReturn()
+            self.users_to_tag.append(user_details[0])
             user_dict = {
                 "email": user,
                 "username": user_details[0],

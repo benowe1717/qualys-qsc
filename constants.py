@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+### parseArgs ###
+PROGRAM_NAME = "main.py"
+PROGRAM_DESCRIPTION = "Qualys QSC Hands-on Training is a `tool` that allows `administrators/trainers` to `provision accounts in a Qualys subscription`."
+VERSION = "0.1.9"
+AUTHOR = "Benjamin Owen"
+REPO = "https://github.com/benowe1717/qualys-qsc"
+###
+
 REQUIRED_FIELDS = {
     "user_role": "reader",
     "business_unit": "Unassigned",
