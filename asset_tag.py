@@ -156,7 +156,7 @@ class qualysApiAssetTag():
                         'scopeTags': {
                             'add': {
                                 'TagData': {
-                                    'name': tagname
+                                    'name': f"{constants.TAG_NAME}{tagname}"
                                 }
                             }
                         }
