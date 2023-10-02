@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import constants
 from auth import qualysApiAuth
-import requests
+import requests, xmltodict
 
 class requestsHelper():
     """
