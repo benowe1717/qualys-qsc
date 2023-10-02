@@ -30,6 +30,10 @@ class requestsHelper():
     ######################
     ### PUBLIC OBJECTS ###
     ######################
+    headers = {
+        "X-Requested-With": "Python3Requests",
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
 
     def __init__(self):
         self._auth = qualysApiAuth()

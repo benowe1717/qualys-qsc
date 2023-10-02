@@ -33,7 +33,6 @@ class qualysApiUser():
     ### PUBLIC OBJECTS ###
     ######################
     helper = ""
-    headers = {"X-Requested-With": "Python3Requests", "Content-Type": "application/x-www-form-urlencoded"}
     failed_users = []
     successful_users = []
     users_to_tag = []
