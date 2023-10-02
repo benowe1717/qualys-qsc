@@ -78,7 +78,7 @@ class qualysApiAssetTag():
             child tags.
         """
         endpoint = f"/qps/rest/2.0/create/am/tag"
-        self.headers["Content-Type"] = "text/xml"
+        self.helper.headers["Content-Type"] = "text/xml"
         payload = {
             'ServiceRequest': {
                 'data': {
@@ -113,7 +113,7 @@ class qualysApiAssetTag():
             required child tags.
         """
         endpoint = f"/qps/rest/2.0/update/am/tag/{self.global_tag_id}"
-        self.headers["Content-Type"] = "text/xml"
+        self.helper.headers["Content-Type"] = "text/xml"
         payload = {
             'ServiceRequest': {
                 'data': {
@@ -148,7 +148,7 @@ class qualysApiAssetTag():
             userid
         """
         endpoint = f"/qps/rest/2.0/update/am/user/{userid}"
-        self.headers["Content-Type"] = "text/xml"
+        self.helper.headers["Content-Type"] = "text/xml"
         payload = {
             'ServiceRequest': {
                 'data': {
@@ -202,7 +202,7 @@ class qualysApiAssetTag():
                 }
             }
         }
-        result = self._callApi(endpoint, payload, "xml")
+        result = self.helper.callApi(endpoint, payload, "xml")
         if result:
             xml = qualysApiXmlParser(result)
             tag_result = xml.parseTagAssetReturn()
