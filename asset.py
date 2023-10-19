@@ -2,6 +2,7 @@
 import constants
 from requestshelper import requestsHelper
 from xml_parser import qualysApiXmlParser
+import logging
 
 class qualysApiAsset():
     """
@@ -31,13 +32,17 @@ class qualysApiAsset():
     ######################
     ### PUBLIC OBJECTS ###
     ######################
-    helper = ""
-    headers = {"X-Requested-With": "Python3Requests", "Content-Type": "application/x-www-form-urlencoded"}
-    failed_assets = []
-    successful_assets = []
     assets_to_tag = []
+    failed_assets = []
+    helper = ""
+    logger = ""
+    successful_assets = []
 
     def __init__(self):
+        self.logger = logging.getLogger(__name__)
+        self.logger.info(
+            "Starting up the qualysApiAsset() class..."
+        )
         self.helper = requestsHelper()
 
     def searchAssets(self, needle):
@@ -51,6 +56,10 @@ class qualysApiAsset():
             type: string
             sample: EC2
         """
+        self.logger.info(
+            f"Starting a search for assets using the term: {needle}..."
+        )
+
         limit = 100
         offset = 0
         endpoint = "/qps/rest/2.0/search/am/asset"
@@ -70,13 +79,22 @@ class qualysApiAsset():
         }
         result = self.helper.callApi(endpoint, payload, "xml")
         if not result:
-            print(f"ERROR: Unable to search assets!")
+            self.logger.error(
+                "Unable to search for assets!"
+            )
             exit(1)
+
         else:
+            self.logger.info(
+                "Successfully found assets matching the search term!"
+            )
             xml = qualysApiXmlParser(result)
-            while xml.xml_data["ServiceResponse"]["responseCode"] == "SUCCESS":
+            responseCode = xml.xml_data["ServiceResponse"]["responseCode"]
+
+            while responseCode == "SUCCESS":
                 for asset in xml.xml_data["ServiceResponse"]["data"]["Asset"]:
                     do_not_tag = 0
+
                     for tag in asset["tags"]["list"]["TagSimple"]:
                         if constants.TAG_NAME in tag["name"]:
                             do_not_tag = 1
@@ -91,10 +109,16 @@ class qualysApiAsset():
                     offset = offset + limit
                     payload["ServiceRequest"]["preferences"]["startFromOffset"] = str(offset)
                     result = self._callApi(endpoint, payload, "xml")
+
                     if not result:
-                        print(f"ERROR: Unable to search assets!")
+                        self.logger.error(
+                            "Unable to search for assets!"
+                        )
                         exit(1)
+
                     else:
                         xml = qualysApiXmlParser(result)
+                        responseCode = xml.xml_data["ServiceResponse"]["responseCode"]
+                        
                 else:
                     break

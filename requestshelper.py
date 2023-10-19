@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import constants
 from auth import qualysApiAuth
-import requests, xmltodict
+import logging, requests, xmltodict
 
 class requestsHelper():
     """
@@ -34,8 +34,13 @@ class requestsHelper():
         "X-Requested-With": "Python3Requests",
         "Content-Type": "application/x-www-form-urlencoded"
     }
+    logger = ""
 
     def __init__(self):
+        self.logger = logging.getLogger(__name__)
+        self.logger.info(
+            "Starting up the requestsHelper() class..."
+        )
         self._auth = qualysApiAuth()
 
     def callApi(self, endpoint, payload=None, request_type=None):
@@ -60,17 +65,43 @@ class requestsHelper():
                     False on failure
         """
         url = self._auth.SCHEME + self._auth.BASE_URL + endpoint
-        basic = requests.auth.HTTPBasicAuth(self._auth._username, self._auth._password)
+        basic = requests.auth.HTTPBasicAuth(
+            self._auth._username, 
+            self._auth._password
+        )
         if payload:
             if request_type == "params":
-                r = requests.post(url=url, headers=self.headers, data=payload, auth=basic)
+                r = requests.post(
+                    url=url, 
+                    headers=self.headers, 
+                    data=payload, 
+                    auth=basic
+                
+                )
             elif request_type == "xml":
                 self.headers["Content-Type"] = "text/xml"
-                r = requests.post(url=url, headers=self.headers, data=xmltodict.unparse(payload), auth=basic)
+                r = requests.post(
+                    url=url, 
+                    headers=self.headers, 
+                    data=xmltodict.unparse(payload), 
+                    auth=basic
+                )
+
         else:
-            r = requests.get(url=url, headers=self.headers, auth=basic)
+            r = requests.get(
+                url=url, 
+                headers=self.headers, 
+                auth=basic
+            )
+
         if r.status_code == 200:
             return r.text
+
         else:
-            print(f"ERROR: Qualys API Call failed! URL: {url} :: Response Code: {r.status_code} :: Headers: {r.headers} :: Details: {r.text}")
+            self.logger.error(
+                f"Qualys API Call failed! URL: {url} :: "
+                f"Response Code: {r.status_code} :: "
+                f"Headers: {r.headers} :: "
+                f"Details: {r.text}"
+            )
             return False

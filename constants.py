@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+import sys
+
+LOG_FILE = "qualys-qsc.log"
+FORMAT = "%(asctime)s %(name)s [%(levelname)s] %(message)s"
+STREAM = sys.stdout
 
 ### parseArgs ###
 PROGRAM_NAME = "main.py"

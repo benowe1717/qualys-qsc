@@ -2,7 +2,7 @@
 import constants
 from requestshelper import requestsHelper
 from xml_parser import qualysApiXmlParser
-import time
+import logging, time
 
 class qualysApiUser():
     """
@@ -33,26 +33,35 @@ class qualysApiUser():
     ### PUBLIC OBJECTS ###
     ######################
     helper = ""
+    logger = ""
     failed_users = []
     successful_users = []
     users_to_tag = []
     user_details = []
 
     def __init__(self):
+        self.logger = logging.getLogger(__name__)
+        self.logger.info(
+            "Starting up the qualysApiUser() class..."
+        )
         self.helper = requestsHelper()
 
     def addUser(self, user):
         """
             https://www.qualys.com/docs/qualys-api-vmpc-user-guide.pdf#G17.783431
             https://documenter.getpostman.com/view/7159960/SVzw51A9#52dc0ffe-a2ae-4dea-9cbb-661251477df5
-            This method takes in an email address and creates the user in the
-            given Qualys Subscription. The only input is the email address, the rest comes from
-            the constants file.
+            This method takes in an email address and creates the user
+            in the given Qualys Subscription. The only input is the email
+            address, the rest comes from the constants file.
 
             param: users
             type: string
             sample: test@test.com
         """
+        self.logger.info(
+            f"Attempting to create user: {user}..."
+        )
+
         action = "add"
         send_email = 0
         endpoint = "/msp/user.php"
@@ -60,11 +69,19 @@ class qualysApiUser():
 
         for key, value in constants.REQUIRED_FIELDS.items():
             payload = payload + f"&{key}={value}"
+
         result = self.helper.callApi(endpoint, payload, "params")
         if not result:
+            self.logger.error(
+                f"Failed to create user: {user}!"
+            )
             self.failed_users.append(user)
             return False
+
         else:
+            self.logger.info(
+                f"Successfully created user: {user}!"
+            )
             self.successful_users.append(user)
             xml = qualysApiXmlParser(result)
             user_details = xml.parseUserReturn()
@@ -93,6 +110,10 @@ class qualysApiUser():
             output: integer
             result: 123456 or -1
         """
+        self.logger.info(
+            f"Starting search for user: {username}..."
+        )
+
         endpoint = "/qps/rest/2.0/search/am/user/"
         payload = {
             'ServiceRequest': {
@@ -113,23 +134,37 @@ class qualysApiUser():
         result = self.helper.callApi(endpoint, payload, "xml")
         if not result:
             return -1
+
         else:
             xml = qualysApiXmlParser(result)
             if xml.xml_data["ServiceResponse"]["responseCode"] == "SUCCESS":
                 count = int(xml.xml_data["ServiceResponse"]["count"])
+
                 while count < 1:
-                    print(f"ERROR: Unable to locate the User's ID! This is probably because the user was just created, sleeping for 10s and trying again...")
-                    print(xml.xml_data)
+                    self.logger.warn(
+                        "Unable to locate the User's ID! This is probably "
+                        "because the user was just created. Sleeping for "
+                        "ten seconds and trying again..."
+                    )
                     time.sleep(10)
                     result = self.helper.callApi(endpoint, payload, "xml")
                     if not result:
                         return -1
+
                     else:
                         xml = qualysApiXmlParser(result)
                         count = int(xml.xml_data["ServiceResponse"]["count"])
+
+                self.logger.info(
+                    "Successfully found the User's ID!"
+                )
                 userid = int(xml.xml_data["ServiceResponse"]["data"]["User"]["id"])
                 return userid
+
             else:
+                self.logger.error(
+                    "Failed to find the User's ID!"
+                )
                 return -1
 
     def applyRoleToUser(self, userid, rolename):
@@ -139,6 +174,10 @@ class qualysApiUser():
             applies the role to the user. This ensures that the created user
             has the right permissions within the Qualys subscription.
         """
+        self.logger.info(
+            f"Attempting to apply role: {rolename} to user: {userid}..."
+        )
+
         endpoint = f"/qps/rest/2.0/update/am/user/{userid}"
         payload = {
             'ServiceRequest': {
@@ -162,6 +201,14 @@ class qualysApiUser():
         if result:
             xml = qualysApiXmlParser(result)
             role_result = xml.parseRoleAssignResult()
+
             if role_result:
+                self.logger.info(
+                    "Successfully applied role to user!"
+                )
                 return True
+
+        self.logger.error(
+            "Failed to apply role to user!"
+        )
         return False

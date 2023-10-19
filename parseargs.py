@@ -42,6 +42,10 @@ class parseArgs():
             help="Show this program's current version"
         )
         self.parser.add_argument(
+            "-d", "--debug", action="store_true", required=False,
+            help="Enable debug logging"
+        )
+        self.parser.add_argument(
             "-t", "--test", action="store_true", required=False,
             help="Test the API using the credentials on file before taking any actions"
         )
@@ -66,6 +70,9 @@ class parseArgs():
         if self.args.version:
             self.printVersion()
             self.parser.exit()
+
+        if self.args.debug:
+            self.debug = True
 
         if self.args.test:
             self.action = "test"
