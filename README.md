@@ -32,7 +32,7 @@ credentials:
   password: ""
 
 api:
-  base_url: "qualysapi.qg4.apps.qualys.com/api"
+  base_url: "qualysapi.qg4.apps.qualys.com"
 ```
 
 You may want to update the base_url to match where your Qualys instance is
