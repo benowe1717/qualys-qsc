@@ -1,28 +1,31 @@
 #!/usr/bin/env python3
 import constants
+from parseargs import parseArgs
+from helper import helper
 from auth import qualysApiAuth
 from asset_tag import qualysApiAssetTag
 from user import qualysApiUser
 from asset import qualysApiAsset
-import argparse, csv, os, sys
-
-def writeCsv(data):
-    keys = data[0].keys()
-    with open(constants.OUTPUT_FILE, "w") as file:
-        dict_writer = csv.DictWriter(file, keys)
-        dict_writer.writeheader()
-        dict_writer.writerows(data)
+import csv, logging, os, sys
 
 def create(users):
-    # This may seem like an unnecessary thing to repeat, however, since we try to use session-based
-    # authentication whenever possible, we want to ensure we are refreshing that active session before
-    # any critical work needs to be done to help minimize authentication issues in the middle of work
+    # This may seem like an unnecessary thing to repeat, however,
+    # since we try to use session-based authentication whenever possible,
+    # we want to ensure we are refreshing that active session before any
+    # critical work needs to be done to help minimize authentication issues
+    # in the middle of work
     user = qualysApiUser()
+    h = helper()
 
     errors = 0
     successes = 0
-    for i in users:
-        email = i.lower().strip()
+    logger = logging.getLogger(__name__)
+    logger.info(
+        "Starting user creation process..."
+    )
+
+    for u in users:
+        email = u.lower().strip()
         result = user.addUser(email)
         if not result:
             errors += 1
@@ -30,19 +33,37 @@ def create(users):
             successes += 1
 
     if errors > 0:
-        print(f"{errors} users were not able to be created! Please check their details for accuracy!")
-        print(", ".join(user.failed_users))
+        logger.error(
+            f"{errors} users were not able to be created! Please check "
+            "their details for accuracy!"
+        )
+        logger.error(
+            ", ".join(user.failed_users)
+        )
     
     if successes > 0:
-        print(f"{successes} users were created successfully!")
-        print(", ".join(user.successful_users))
+        logger.info(
+            f"{successes} users were created successfully!"
+        )
+        logger.info(
+            ", ".join(user.successful_users)
+        )
 
-    writeCsv(user.user_details)
+    logger.info(
+        "User creation process is complete!"
+    )
+
+    h.writeCsv(user.user_details)
 
     return user
 
-def createAndTag(df):
-    user = create(df)
+def createAndTag(users):
+    user = create(users)
+
+    logger = logging.getLogger(__name__)
+    logging.info(
+        "Starting the User and Asset Tagging process..."
+    )
     tagging = qualysApiAssetTag()
 
     result = tagging.searchTags()
@@ -89,20 +110,38 @@ def createAndTag(df):
             failed_tags.append(username)
 
         if role_errors > 0:
-            print(f"{role_errors} roles were not able to be assigned to {username}!")
-            print(", ".join(failed_roles))
+            logger.error(
+                f"{role_errors} roles were not able to be assigned to "
+                f"{username}!"
+            )
+            logger.error(
+                ", ".join(failed_roles)
+            )
 
         if role_successes > 0:
-            print(f"{role_successes} roles were assigned successfully to {username}!")
-            print(", ".join(successful_roles))
+            logger.info(
+                f"{role_successes} roles were assigned successfully to "
+                f"{username}!"
+            )
+            logger.info(
+                ", ".join(successful_roles)
+            )
 
     if tag_errors > 0:
-        print(f"{tag_errors} users were not able to be tagged!")
-        print(", ".join(failed_tags))
+        logger.error(
+            f"{tag_errors} users were not able to be tagged!"
+        )
+        logger.error(
+            ", ".join(failed_tags)
+        )
     
     if tag_successes > 0:
-        print(f"{tag_successes} users were tagged successfully!")
-        print(", ".join(successful_tags))
+        logger.info(
+            f"{tag_successes} users were tagged successfully!"
+        )
+        logger.info(
+            ", ".join(successful_tags)
+        )
 
     asset = qualysApiAsset()
     asset.searchAssets(constants.NEEDLE)
@@ -130,7 +169,7 @@ def createAndTag(df):
         working_count = asset_count
 
     if working_count > 0:
-        while i < working_count:
+        while i <= working_count:
             for key, value in asset_list[i].items():
                 assetid = key
                 assetname = value["name"]
@@ -150,97 +189,151 @@ def createAndTag(df):
             i += 1
 
     if errors > 0:
-        print(f"{errors} assets were not able to be tagged!")
-        print(", ".join(failed_assets))
+        logger.error(
+            f"{errors} assets were not able to be tagged!"
+        )
+        logger.error(
+            ", ".join(failed_assets)
+        )
 
     if successes > 0:
-        print(f"{successes} assets were were tagged successfully!")
-        print(", ".join(successful_assets))
+        logger.info(
+            f"{successes} assets were tagged successfully!"
+        )
+        logger.info(
+            ", ".join(successful_assets)
+        )
 
-def printVersion():
-    """
-        This function is used in the argparse library to print the
-        current version of this application
-    """
-    print("qsc_automation.py 0.1.8")
-    print("This is free software: you are free to change and redistribute it.")
-    print("There is NO WARRANTY, to the extent permitted by law.\n")
-    print("Written by Benjamin Owen; see below for original code")
-    print("<https://github.com/benowe1717/qualys-qsc>")
-
-def readFile(f):
-    with open(f, "r") as file:
-        lines = file.readlines()
-        return lines
-    return False
+    logging.info(
+        "User and Asset Tagging process complete!"
+    )
 
 def main():
-    parser = argparse.ArgumentParser(prog="main.py", description="Qualys QSC Hands-on Training is a `tool` that allows `administrators/trainers` to `provision accounts in a Qualys subscription`.")
-    parser.add_argument("--version", action="store_true", required=False, help="show this program's current version")
-    parser.add_argument("-f", "--file", nargs="+", required=False)
-    parser.add_argument("-t", "--test", action="store_true", required=False, help="Test the API using the credentials on file before taking any actions")
-    parser.add_argument("-c", "--create", action="store_true", required=False, help="Create users in the provided text file")
-    parser.add_argument("-a", "--create-and-tag", action="store_true", required=False, help="Create users in the provided text, create a Global Asset Tag with child tags and tag all users and hosts")
-    args = parser.parse_args()
+    args = sys.argv
+    myparser = parseArgs(args)
+    debug = myparser.debug
 
-    if len(sys.argv) == 1:
-        parser.print_help()
-        parser.exit()
+    logger = logging.getLogger()
+    if debug:
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
 
-    if args.version:
-        printVersion()
-        parser.exit()
+    formatter = logging.Formatter(constants.FORMAT)
 
-    if args.test:
+    sh = logging.StreamHandler(constants.STREAM)
+    sh.setFormatter(formatter)
+    logger.addHandler(sh)
+
+    fh = logging.FileHandler(constants.LOG_FILE)
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+
+    logger.info("Starting script...")
+
+    if myparser.action == "test":
         auth = qualysApiAuth()
-        print("Success! Your credentials are valid!")
-        parser.exit()
+        logger.info(
+            "Success! Your credentials are valid!"
+        )
 
-    if args.file:
+    elif myparser.action == "create":
         lines = []
-        for f in args.file:
+        for f in myparser.files:
             if not os.path.exists(f):
-                print(f"ERROR: Unable to locate file: {f}! Removing file from the list...")
-                args.file.remove(f)
+                logger.error(
+                    f"Unable to locate file: {f}! "
+                    "Removing file from the list..."
+                )
+                myparser.files.remove(f)
+
             else:
-                result = readFile(f)
-                if result is False:
-                    print(f"ERROR: Unable to read file: {f}! Removing file from the list...")
-                    args.file.remove(f)
+                h = helper()
+                result = h.readFile(f)
+                if not result:
+                    logger.error(
+                        f"Unable to read file: {f}! "
+                        "Removing file from the list..."
+                    )
+                    myparser.files.remove(f)
+
                 else:
                     lines.append(result)
 
-    if len(lines) > 0:
         users = [user for line in lines for user in line]
-        if args.create:
-            create(users)
+        create(users)
 
-        elif args.create_and_tag:
-            # loop over df
-            # create each user
-            # create global tag if needed
-            # create child tags using usernames
-            # tag all usernames with child tags
-            # tag all assets with child tags
-            # done
-            for df in dataframes:
-                data = df[0]
-                filename = df[1]
+        logger.info(
+            "All users that were successfully created have been written "
+            f"to the {constants.OUTPUT_FILE} file."
+        )
+        logger.info(
+            "Please ensure that you have installed the `mailmerge` utility "
+            "from the requirements.txt file"
+        )
+        logger.info(
+            "Please also ensure that you have configured your SMTP server "
+            "in the mailmerge_server.conf file"
+        )
+        logger.info(
+            "And finally confirm the email template is present "
+            "in the file mailmerge_template.txt"
+        )
+        logger.info(
+            "If all looks good, you can run "
+            "`mailmerge --no-limit --no-dry-run` to send out credentials "
+            "to all users!"
+        )
 
-                createAndTag(data)
-        else:
-            parser.print_help()
-            parser.exit()
+    elif myparser.action == "create-and-tag":
+        lines = []
+        for f in myparser.files:
+            if not os.path.exists(f):
+                logger.error(
+                    f"Unable to locate file: {f}! "
+                    "Removing file from the list..."
+                )
+                myparser.files.remove(f)
 
-        print(f"All users that were successfully created have been written to the {constants.OUTPUT_FILE} file.")
-        print("Please ensure that you have installed the `mailmerge` utility from the requirements.txt file")
-        print("Please also ensure that you have configured your SMTP sersver in the mailmerge_server.conf file")
-        print("And finally confirm the email template is present in the file mailmerge_template.txt")
-        print("If all looks good, you can run `mailmerge --no-limit --no-dry-run` to send out credentials to all users!")
-        
-    else:
-        print("No files remain to be parsed! Exiting...")
-        exit(0)
+            else:
+                h = helper()
+                result = h.readFile(f)
+                if not result:
+                    logger.error(
+                        f"Unable to read file: {f}! "
+                        "Removing file from the list..."
+                    )
+                    myparser.files.remove(f)
+
+                else:
+                    lines.append(result)
+
+        users = [user for line in lines for user in line]
+        createAndTag(users)
+
+        logger.info(
+            "All users that were successfully created have been written "
+            f"to the {constants.OUTPUT_FILE} file."
+        )
+        logger.info(
+            "Please ensure that you have installed the `mailmerge` utility "
+            "from the requirements.txt file"
+        )
+        logger.info(
+            "Please also ensure that you have configured your SMTP server "
+            "in the mailmerge_server.conf file"
+        )
+        logger.info(
+            "And finally confirm the email template is present "
+            "in the file mailmerge_template.txt"
+        )
+        logger.info(
+            "If all looks good, you can run "
+            "`mailmerge --no-limit --no-dry-run` to send out credentials "
+            "to all users!"
+        )
+
+    logger.info("Script finished!")
 
 if __name__ == "__main__":
     main()

@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 import constants
-from auth import qualysApiAuth
+from requestshelper import requestsHelper
 from xml_parser import qualysApiXmlParser
-from urllib.parse import quote
-import os, requests, xmltodict, yaml
+import logging
 
 class qualysApiAsset():
     """
@@ -29,58 +28,22 @@ class qualysApiAsset():
     #######################
     ### PRIVATE OBJECTS ###
     #######################
-    _auth = ""
 
     ######################
     ### PUBLIC OBJECTS ###
     ######################
-    headers = {"X-Requested-With": "Python3Requests", "Content-Type": "application/x-www-form-urlencoded"}
-    failed_assets = []
-    successful_assets = []
     assets_to_tag = []
+    failed_assets = []
+    helper = ""
+    logger = ""
+    successful_assets = []
 
     def __init__(self):
-        # Instantiate the qualysApiAuth() class, which will run all the required authentication checks
-        # right out of the gate. If there are any problems authenticating, it will die right here.
-        # Otherwise, we continue as normal
-        self._auth = qualysApiAuth()
-
-    def _callApi(self, endpoint, payload=None, request_type=None):
-        """
-            This method is here to make the network call to the Qualys API
-            and serves as a repeatable point of entry to that API.
-            param: endpoint
-            type: string
-            sampe: /path/to/api/endpoint
-
-            param: payload
-            type: string/dict
-            sample: param1=this&param2=that
-            sample: {'param1': 'this', 'param2': 'that'}
-
-            param: request_type
-            type: string
-            this is either "params" or "xml"
-
-            output: dict/boolean
-            result: either a dict from xmltodict library on success or
-                    False on failure
-        """
-        url = self._auth.SCHEME + self._auth.BASE_URL + endpoint
-        basic = requests.auth.HTTPBasicAuth(self._auth._username, self._auth._password)
-        if payload:
-            if request_type == "params":
-                r = requests.post(url=url, headers=self.headers, data=payload, auth=basic)
-            elif request_type == "xml":
-                self.headers["Content-Type"] = "text/xml"
-                r = requests.post(url=url, headers=self.headers, data=xmltodict.unparse(payload), auth=basic)
-        else:
-            r = requests.get(url=url, headers=self.headers, auth=basic)
-        if r.status_code == 200:
-            return r.text
-        else:
-            print(f"ERROR: Qualys API Call failed! URL: {url} :: Response Code: {r.status_code} :: Headers: {r.headers} :: Details: {r.text}")
-            return False
+        self.logger = logging.getLogger(__name__)
+        self.logger.info(
+            "Starting up the qualysApiAsset() class..."
+        )
+        self.helper = requestsHelper()
 
     def searchAssets(self, needle):
         """
@@ -93,7 +56,11 @@ class qualysApiAsset():
             type: string
             sample: EC2
         """
-        limit = 5
+        self.logger.info(
+            f"Starting a search for assets using the term: {needle}..."
+        )
+
+        limit = 100
         offset = 0
         endpoint = "/qps/rest/2.0/search/am/asset"
         payload = {
@@ -110,15 +77,24 @@ class qualysApiAsset():
                 }
             }
         }
-        result = self._callApi(endpoint, payload, "xml")
+        result = self.helper.callApi(endpoint, payload, "xml")
         if not result:
-            print(f"ERROR: Unable to search assets!")
+            self.logger.error(
+                "Unable to search for assets!"
+            )
             exit(1)
+
         else:
+            self.logger.info(
+                "Successfully found assets matching the search term!"
+            )
             xml = qualysApiXmlParser(result)
-            while xml.xml_data["ServiceResponse"]["responseCode"] == "SUCCESS":
+            responseCode = xml.xml_data["ServiceResponse"]["responseCode"]
+
+            while responseCode == "SUCCESS":
                 for asset in xml.xml_data["ServiceResponse"]["data"]["Asset"]:
                     do_not_tag = 0
+
                     for tag in asset["tags"]["list"]["TagSimple"]:
                         if constants.TAG_NAME in tag["name"]:
                             do_not_tag = 1
@@ -133,10 +109,16 @@ class qualysApiAsset():
                     offset = offset + limit
                     payload["ServiceRequest"]["preferences"]["startFromOffset"] = str(offset)
                     result = self._callApi(endpoint, payload, "xml")
+
                     if not result:
-                        print(f"ERROR: Unable to search assets!")
+                        self.logger.error(
+                            "Unable to search for assets!"
+                        )
                         exit(1)
+
                     else:
                         xml = qualysApiXmlParser(result)
+                        responseCode = xml.xml_data["ServiceResponse"]["responseCode"]
+                        
                 else:
                     break

@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 import constants
-from auth import qualysApiAuth
+from requestshelper import requestsHelper
 from xml_parser import qualysApiXmlParser
-from urllib.parse import quote
-import os, requests, time, xmltodict, yaml
+import logging
 
 class qualysApiAssetTag():
     """
@@ -11,12 +10,6 @@ class qualysApiAssetTag():
         for Asset Tags and then tagging specific Assets or Users with
         the given Asset Tags.
     """
-
-    # Note that there are no "private" objects or methods in the
-    # Python class structure, but it is generally accepted that
-    # methods and objects with a single "_" (underscore) preceding
-    # the name indicates something "not to be messed with". So I'm
-    # adopting that convention to denote "private" objects and methods
 
     #########################
     ### PRIVATE CONSTANTS ###
@@ -30,65 +23,37 @@ class qualysApiAssetTag():
     #######################
     ### PRIVATE OBJECTS ###
     #######################
-    _auth = ""
 
     ######################
     ### PUBLIC OBJECTS ###
     ######################
-    headers = {"X-Requested-With": "Python3Requests", "Content-Type": "application/x-www-form-urlencoded"}
     global_tag_id = -1
     child_tags = []
+    helper = ""
+    logger = ""
 
     def __init__(self):
-        # Instantiate the qualysApiAuth() class, which will run all the required authentication checks
-        # right out of the gate. If there are any problems authenticating, it will die right here.
-        # Otherwise, we continue as normal
-        self._auth = qualysApiAuth()
-
-    def _callApi(self, endpoint, payload, request_type):
-        """
-            This method is here to make the network call to the Qualys API
-            and serves as a repeatable point of entry to that API.
-            param: endpoint
-            type: string
-            sampe: /path/to/api/endpoint
-
-            param: payload
-            type: string/dict
-            sample: param1=this&param2=that
-            sample: {'param1': 'this', 'param2': 'that'}
-
-            param: request_type
-            type: string
-            this is either "params" or "xml"
-
-            output: dict/boolean
-            result: either a dict from xmltodict library on success or
-                    False on failure
-        """
-        url = self._auth.SCHEME + self._auth.BASE_URL + endpoint
-        basic = requests.auth.HTTPBasicAuth(self._auth._username, self._auth._password)
-        if request_type == "params":
-            r = requests.post(url=url, headers=self.headers, data=payload, auth=basic)
-        elif request_type == "xml":
-            self.headers["Content-Type"] = "text/xml"
-            r = requests.post(url=url, headers=self.headers, data=xmltodict.unparse(payload), auth=basic)
-        if r.status_code == 200:
-            return r.text
-        else:
-            print(f"ERROR: Qualys API Call failed! URL: {url} :: Response Code: {r.status_code} :: Headers: {r.headers} :: Details: {r.text}")
-            return False
+        self.logger = logging.getLogger(__name__)
+        self.logger.info(
+            "Starting up the qualysApiAssetTag() class..."
+        )
+        self.helper = requestsHelper()
 
     def searchTags(self):
         """
             https://www.qualys.com/docs/qualys-asset-management-tagging-api-v2-user-guide.pdf :: Page 32
-            This method is used to search through all of the Asset Tags in an instance and
-            check to see if the GLOBAL_TAG exists. Based on the existence of the GLOBAL_TAG, 
-            this class will either create the GLOBAL_TAG or update the GLOBAL_TAG with
-            all of the other tags.
+            This method is used to search through all of the Asset Tags in
+            an instance and check to see if the GLOBAL_TAG exists. Based on
+            the existence of the GLOBAL_TAG, this class will either create
+            the GLOBAL_TAG or update the GLOBAL_TAG with all
+            of the other tags.
         """
+        self.logger.info(
+            "Starting a search for the Global Asset Tag..."
+        )
+
         endpoint = "/qps/rest/2.0/search/am/tag"
-        self.headers["Content-Type"] = "text/xml"
+        self.helper.headers["Content-Type"] = "text/xml"
         payload = {
             "ServiceRequest": {
                 "filters": {
@@ -100,24 +65,40 @@ class qualysApiAssetTag():
                 }
             }
         }
-        result = self._callApi(endpoint, payload, "xml")
+        result = self.helper.callApi(endpoint, payload, "xml")
         if result:
+            self.logger.info(
+                "Search for Global Asset Tag complete!"
+            )
             xml = qualysApiXmlParser(result)
             search_result = xml.parseTagSearchReturn()
             if search_result[0] != -1:
+                self.logger.info(
+                    "The Global Asset Tag is already present!"
+                )
                 self.global_tag_id = search_result[0]
                 self.child_tags = search_result[1]
             return True
+            self.logger.info(
+                "The Global Asset Tag is not present and needs to be created!"
+            )
+        self.logger.error(
+            "Unable to search the Qualys API for the Global Asset Tag!"
+        )
         return False
 
     def createGlobalTag(self, tags):
         """
             https://www.qualys.com/docs/qualys-asset-management-tagging-api-v2-user-guide.pdf :: Page 20
-            This method is used to create the GLOBAL_TAG Asset Tag with all of the required
-            child tags.
+            This method is used to create the GLOBAL_TAG Asset Tag with
+            all of the required child tags.
         """
+        self.logger.info(
+            "Creating the Global Asset Tag..."
+        )
+
         endpoint = f"/qps/rest/2.0/create/am/tag"
-        self.headers["Content-Type"] = "text/xml"
+        self.helper.headers["Content-Type"] = "text/xml"
         payload = {
             'ServiceRequest': {
                 'data': {
@@ -137,22 +118,34 @@ class qualysApiAssetTag():
             t = {'name': f"{constants.TAG_NAME}{tag}"}
             payload['ServiceRequest']['data']['Tag']['children']['set']['TagSimple'].append(t)
 
-        result = self._callApi(endpoint, payload, "xml")
+        result = self.helper.callApi(endpoint, payload, "xml")
         if result:
             xml = qualysApiXmlParser(result)
             create_result = xml.parseTagCreateReturn()
+
             if create_result:
+                self.logger.info(
+                    "Successfully created the Global Asset Tag!"
+                )
                 return True
+
+        self.logger.error(
+            "Failed to create the Global Asset Tag!"
+        )
         return False
 
     def updateGlobalTag(self, tags):
         """
             https://www.qualys.com/docs/qualys-asset-management-tagging-api-v2-user-guide.pdf :: Page 25
-            This method is used to update the already existing GLOBAL_TAG Asset Tag with all of the
-            required child tags.
+            This method is used to update the already existing GLOBAL_TAG
+            Asset Tag with all of the required child tags.
         """
+        self.logger.info(
+            "Updating the Global Asset Tag..."
+        )
+
         endpoint = f"/qps/rest/2.0/update/am/tag/{self.global_tag_id}"
-        self.headers["Content-Type"] = "text/xml"
+        self.helper.headers["Content-Type"] = "text/xml"
         payload = {
             'ServiceRequest': {
                 'data': {
@@ -171,12 +164,20 @@ class qualysApiAssetTag():
             t = {'name': f"{constants.TAG_NAME}{tag}"}
             payload['ServiceRequest']['data']['Tag']['children']['set']['TagSimple'].append(t)
 
-        result = self._callApi(endpoint, payload, "xml")
+        result = self.helper.callApi(endpoint, payload, "xml")
         if result:
             xml = qualysApiXmlParser(result)
             update_result = xml.parseTagUpdateReturn()
+
             if update_result:
+                self.logger.info(
+                    "Successfully updated the Global Asset Tag!"
+                )
                 return update_result
+
+        self.logger.error(
+            "Failed to update the Global Asset Tag!"
+        )
         return False
 
     def tagUser(self, userid, tagname):
@@ -186,8 +187,12 @@ class qualysApiAssetTag():
             Update User Tags API call and assigns the given tagname to the
             userid
         """
+        self.logger.info(
+            f"Attempting to tag the user {userid} with tag: {tagname}..."
+        )
+
         endpoint = f"/qps/rest/2.0/update/am/user/{userid}"
-        self.headers["Content-Type"] = "text/xml"
+        self.helper.headers["Content-Type"] = "text/xml"
         payload = {
             'ServiceRequest': {
                 'data': {
@@ -195,7 +200,7 @@ class qualysApiAssetTag():
                         'scopeTags': {
                             'add': {
                                 'TagData': {
-                                    'name': tagname
+                                    'name': f"{constants.TAG_NAME}{tagname}"
                                 }
                             }
                         }
@@ -204,12 +209,20 @@ class qualysApiAssetTag():
             }
         }
 
-        result = self._callApi(endpoint, payload, "xml")
+        result = self.helper.callApi(endpoint, payload, "xml")
         if result:
             xml = qualysApiXmlParser(result)
             tag_result = xml.parseTagUserReturn()
+
             if tag_result:
+                self.logger.info(
+                    "Successfully tagged user!"
+                )
                 return True
+
+        self.logger.error(
+            "Failed to tag user!"
+        )
         return False
 
     def tagAsset(self, assetid, tagid):
@@ -218,6 +231,10 @@ class qualysApiAssetTag():
             This method takes a given assetid and tagid and updates the
             asset with the given tagid
         """
+        self.logger.info(
+            f"Attempting to tag the user {assetid} with tag: {tagid}..."
+        )
+
         endpoint = "/qps/rest/2.0/update/am/asset"
         payload = {
             'ServiceRequest': {
@@ -241,10 +258,18 @@ class qualysApiAssetTag():
                 }
             }
         }
-        result = self._callApi(endpoint, payload, "xml")
+        result = self.helper.callApi(endpoint, payload, "xml")
         if result:
             xml = qualysApiXmlParser(result)
             tag_result = xml.parseTagAssetReturn()
+
             if tag_result:
+                self.logger.info(
+                    "Successfully tagged asset!"
+                )
                 return True
+
+        self.logger.error(
+            "Failed to tag asset!"
+        )
         return False

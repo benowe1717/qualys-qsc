@@ -40,6 +40,16 @@ class qualysApiXmlParser():
             print(f"ERROR: Unable to parse XML Output!")
             exit(1)
 
+    def parseUserList(self):
+        users = []
+        for user in self.xml_data["USER_LIST_OUTPUT"]["USER_LIST"]["USER"]:
+            username = user["USER_LOGIN"]
+            userid = user["USER_ID"]
+            email = user["CONTACT_INFO"]["EMAIL"]
+            user_dict = {userid: {"username": username, "email": email}}
+            users.append(user_dict)
+        return users
+
     def parseUserReturn(self):
         """
             This method is used to parse the XML Output of the
