@@ -80,6 +80,14 @@ def createAndTag(users):
     tag_successes = 0
     for username in user.users_to_tag:
         userid = user.searchUser(username)
+        while userid == -1:
+            logger.warn(
+                "Unable to locate the User's ID! This is probably "
+                "because the user was just created. Sleeping for "
+                "ten seconds and trying again..."
+            )
+            time.sleep(10)
+            userid = user.searchUser(username)
 
         if userid != -1:
             role_errors = 0
@@ -332,6 +340,38 @@ def main():
             "`mailmerge --no-limit --no-dry-run` to send out credentials "
             "to all users!"
         )
+
+    elif myparser.action == "reset":
+        # Search the username first
+        # if it exists, reset its password
+        # else print out message that the 
+        # username cannot be found
+        for user in myparser.users:
+            logger.info(
+                f"Checking if {user} exists..."
+            )
+            myuser = qualysApiUser()
+            userid = myuser.searchUser(user)
+            if userid != -1:
+                password = myuser.resetPassword(user)
+                if password != -1:
+                    logger.info(
+                        f"Successfully reset {user}'s password! "
+                        f"The new password is: {password}"
+                    )
+
+                else:
+                    logger.error(
+                        f"Unable to reset {user}'s password!"
+                    )
+
+            else:
+                logger.error(
+                    "Since we can't find this username, this script assumes" +
+                    " that it must be a typo or this user really doesn't " +
+                    "exist. There is nothing we can do, moving to the " +
+                    "next user..."
+                )
 
     logger.info("Script finished!")
 

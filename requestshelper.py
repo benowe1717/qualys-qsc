@@ -72,25 +72,25 @@ class requestsHelper():
         if payload:
             if request_type == "params":
                 r = requests.post(
-                    url=url, 
-                    headers=self.headers, 
-                    data=payload, 
+                    url=url,
+                    headers=self.headers,
+                    data=payload,
                     auth=basic
-                
                 )
+
             elif request_type == "xml":
                 self.headers["Content-Type"] = "text/xml"
                 r = requests.post(
-                    url=url, 
-                    headers=self.headers, 
-                    data=xmltodict.unparse(payload), 
+                    url=url,
+                    headers=self.headers,
+                    data=xmltodict.unparse(payload),
                     auth=basic
                 )
 
         else:
             r = requests.get(
-                url=url, 
-                headers=self.headers, 
+                url=url,
+                headers=self.headers,
                 auth=basic
             )
 
