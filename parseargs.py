@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import constants
-import argparse
+import argparse, itertools
 
 class parseArgs():
     """
@@ -31,6 +31,7 @@ class parseArgs():
     args = ""
     action = ""
     files = []
+    users = []
     debug = False
 
     def __init__(self, args):
@@ -60,6 +61,10 @@ class parseArgs():
         self.parser.add_argument(
             "-a", "--create-and-tag", action="store_true", required=False,
             help="Create users in the provided text, create a Global Asset Tag with child tags and tag all users and hosts"
+        )
+        self.parser.add_argument(
+            "-r", "--reset-password", nargs="+", required=False,
+            help="Reset the password for the provided usernames"
         )
         self.args = self.parser.parse_args()
 
@@ -92,6 +97,19 @@ class parseArgs():
             else:
                 self.action = "create-and-tag"
                 self.files = self.args.file
+
+        if self.args.reset_password:
+            self.action = "reset"
+            for arg in self.args.reset_password:
+                if "," in arg:
+                    split = arg.split(",")
+                    
+                    for i in split:
+                        if i:
+                            self.users.append(i)
+
+                else:
+                    self.users.append(arg)
 
     def printVersion(self):
         """

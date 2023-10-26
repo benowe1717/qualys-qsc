@@ -139,21 +139,8 @@ class qualysApiUser():
             xml = qualysApiXmlParser(result)
             if xml.xml_data["ServiceResponse"]["responseCode"] == "SUCCESS":
                 count = int(xml.xml_data["ServiceResponse"]["count"])
-
-                while count < 1:
-                    self.logger.warn(
-                        "Unable to locate the User's ID! This is probably "
-                        "because the user was just created. Sleeping for "
-                        "ten seconds and trying again..."
-                    )
-                    time.sleep(10)
-                    result = self.helper.callApi(endpoint, payload, "xml")
-                    if not result:
-                        return -1
-
-                    else:
-                        xml = qualysApiXmlParser(result)
-                        count = int(xml.xml_data["ServiceResponse"]["count"])
+                if count == 0:
+                    return -1
 
                 self.logger.info(
                     "Successfully found the User's ID!"
@@ -212,3 +199,31 @@ class qualysApiUser():
             "Failed to apply role to user!"
         )
         return False
+
+    def resetPassword(self, username):
+        """
+            https://www.qualys.com/docs/qualys-api-vmpc-user-guide.pdf#G17.784588
+            Take in a username and change the password for that user
+        """
+        # you actually CANNOT do this here b/c it's the qualys api so
+        # of course it doesn't work like the rest of the api calls do
+        # where this WOULD work and SHOULD work but it DOESN'T work
+        # endpoint = "/msp/password_change.php"
+        # payload = {
+        #     "user_logins": username,
+        #     "email": 0
+        # }
+
+        endpoint = f"/msp/password_change.php?user_logins={username}&email=0"
+        result = self.helper.callApi(endpoint)
+        if not result:
+            return -1
+
+        else:
+            xml = qualysApiXmlParser(result)
+            password = xml.parsePasswordReset()
+            if not password:
+                return -1
+
+            else:
+                return password

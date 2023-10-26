@@ -152,3 +152,15 @@ class qualysApiXmlParser():
             return True
         else:
             return False
+
+    def parsePasswordReset(self):
+        """
+            This method is used to parse the XML Output of the
+            Qualys API Password Reset call to get the password
+            for the user
+        """
+        top = self.xml_data["PASSWORD_CHANGE_OUTPUT"]
+        if top["RETURN"]["@status"] == "SUCCESS":
+            changes = top["RETURN"]["CHANGES"]
+            return changes["USER_LIST"]["USER"]["PASSWORD"]
+        return False
