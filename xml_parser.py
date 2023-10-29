@@ -74,11 +74,11 @@ class qualysApiXmlParser():
             exists and return it's ID or return -1
         """
         tag_id = -1
+        child_tags = []
         count = int(self.xml_data["ServiceResponse"]["count"])
 
         if count >= 1:
             tag_id = int(self.xml_data["ServiceResponse"]["data"]["Tag"]["id"])
-            child_tags = []
             for item in self.xml_data["ServiceResponse"]["data"]["Tag"]["children"]["list"]["TagSimple"]:
                 child_tagid = item["id"]
                 child_tagname = item["name"]

@@ -8,7 +8,7 @@ STREAM = sys.stdout
 ### parseArgs ###
 PROGRAM_NAME = "main.py"
 PROGRAM_DESCRIPTION = "Qualys QSC Hands-on Training is a `tool` that allows `administrators/trainers` to `provision accounts in a Qualys subscription`."
-VERSION = "0.2.0"
+VERSION = "0.2.1"
 AUTHOR = "Benjamin Owen"
 REPO = "https://github.com/benowe1717/qualys-qsc"
 ###
@@ -27,7 +27,7 @@ REQUIRED_FIELDS = {
     "state": "California"
 }
 URL = "https://qualysguard.qg4.apps.qualys.com"
-GLOBAL_TAG = "QSC"
+GLOBAL_TAG = "QSCOrlando2023"
 NEEDLE = "EC2"
 ROLES = [
     "CSAM User", "PATCH USER"

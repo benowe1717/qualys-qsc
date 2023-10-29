@@ -6,7 +6,7 @@ from auth import qualysApiAuth
 from asset_tag import qualysApiAssetTag
 from user import qualysApiUser
 from asset import qualysApiAsset
-import csv, logging, os, sys
+import csv, logging, os, sys, time
 
 def create(users):
     # This may seem like an unnecessary thing to repeat, however,
@@ -81,7 +81,7 @@ def createAndTag(users):
     for username in user.users_to_tag:
         userid = user.searchUser(username)
         while userid == -1:
-            logger.warn(
+            logger.warning(
                 "Unable to locate the User's ID! This is probably "
                 "because the user was just created. Sleeping for "
                 "ten seconds and trying again..."
@@ -177,7 +177,7 @@ def createAndTag(users):
         working_count = asset_count
 
     if working_count > 0:
-        while i <= working_count:
+        while i < working_count:
             for key, value in asset_list[i].items():
                 assetid = key
                 assetname = value["name"]
