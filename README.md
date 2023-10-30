@@ -21,7 +21,7 @@ Before you begin, ensure you have met the following requirements:
 To install `Qualys QSC Hands-on Training`, follow these steps:
 
 - Install all required libraries using the `requirements.txt` file and `pip3`:
-`pip3 install requirements.txt`
+`pip3 install -r requirements.txt`
 
 - Create the credentials yaml file that is necessary:
 Create a file in the same directory as `main.py` called `.creds.yaml`
@@ -48,6 +48,7 @@ You may want to update the base_url to match where your Qualys instance is
 There are two switches that are necessary to know:
 1. `-c/--create`: This will taken the given `users.txt` file and create a user for each record in the CSV
 2. `-a/--create-and-tag`: This will take the given `users.txt` file, create a user for each record in the CSV, create an asset tag using each user's username as the name, then apply the asset tag to the appropriate user, and apply the asset tag to a given asset/host
+3. `-r/--reset-password`: This will ask for a set of usernames (or a single username) and reset the password of that user
 
 NOTE: Please ensure that each email address is on a separate line, one email address per line!
 
@@ -63,6 +64,9 @@ This will show you if your credentials are valid or need updating.
 
 - To create and tag users, run the program like this:
 `python3 main.py --create-and-tag --file /some/path/to/your/users.txt`
+
+- To reset a user's password, you can do something like this:
+`python3 main.py --reset-password quays1234 quays2345 quays3456`
 
 ## Contributing to Qualys QSC
 
