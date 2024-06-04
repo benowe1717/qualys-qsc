@@ -1,5 +1,4 @@
-.creds.yaml
-.session_token
-*.py[cod]
+.pytest_cache/
 __pycache__/
 *.log
+data/credentials.yaml
