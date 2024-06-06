@@ -2,6 +2,7 @@
 import sys
 
 from src.classes.parseargs import ParseArgs
+from src.classes.qualys_api import QualysApi
 
 
 def main():
@@ -10,7 +11,18 @@ def main():
 
     if parser.action == 'test':
         print('Starting test process...')
-        print(parser.credentials)
+        if not parser.credentials:
+            print('Invalid credentials file!')
+            exit(1)
+
+        qa = QualysApi(parser.credentials)  # type: ignore
+        result = qa.test()
+        if not result:
+            print('Invalid username/password or other error!')
+            exit(1)
+
+        print('Your credentials are valid!')
+        exit(0)
 
     elif parser.action == 'new':
         print('Starting new user creation process...')
