@@ -8,7 +8,7 @@ from src.constants import constants
 
 class ParseArgs:
     NAME = constants.ARGPARSE_PROGRAM_NAME
-    DESC = constants.ARGPARSE_PROGRAM_DESCRIPTOIN
+    DESC = constants.ARGPARSE_PROGRAM_DESCRIPTION
     VER = constants.ARGPARSE_PROGRAM_VERSION
     AUTH = constants.ARGPARSE_PROGRAM_AUTHOR
     REPO = constants.ARGPARSE_PROGRAM_REPO
