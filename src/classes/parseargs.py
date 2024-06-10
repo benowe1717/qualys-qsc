@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import argparse
-import re
 
 from src.classes.file_checker import FileChecker
 from src.constants import constants
@@ -29,7 +28,7 @@ class ParseArgs:
             help='Show this program\'s current version')
 
         self.parser.add_argument(
-            '-c',
+            '-e',
             '--credentials',
             nargs=1,
             help='The filepath to the file containing your API credentials'
@@ -44,8 +43,8 @@ class ParseArgs:
         )
 
         self.parser.add_argument(
-            '-n',
-            '--new',
+            '-c',
+            '--create',
             nargs=1,
             required=False,
             help='Create users in the Qualys Subscription from the given file'
@@ -57,6 +56,16 @@ class ParseArgs:
             nargs='+',
             required=False,
             help='Reset the password for each of the provided users'
+        )
+
+        msg = 'Create users and Tags then assign Tags to users in the '
+        msg += 'Qualys Subscription from the given file'
+        self.parser.add_argument(
+            '-a',
+            '--create-and-tag',
+            nargs=1,
+            required=False,
+            help=msg
         )
 
         self.parse_args = self.parser.parse_args()
@@ -81,12 +90,12 @@ class ParseArgs:
             if not self.credentials:
                 self.parser.error('Invalid credentials file')
 
-        # '-n'/'--new' provided
+        # '-c'/'--create' provided
         # requires credentials
-        if self.parse_args.new:
-            self.action = 'new'
+        if self.parse_args.create:
+            self.action = 'create'
             if self.parse_args.credentials is None:
-                self.parser.error('--new requires --credentials')
+                self.parser.error('--create requires --credentials')
 
             self.credentials = self._is_valid_credentials_path(
                 self.parse_args.credentials[0])
@@ -111,6 +120,22 @@ class ParseArgs:
 
             self.users = [user.strip(', ')
                           for user in self.parse_args.reset_password]
+
+        # '-a'/'--create-and-tag' provided
+        # requires credentials
+        if self.parse_args.create_and_tag:
+            self.action = 'tag'
+            if self.parse_args.credentials is None:
+                self.parser.error('--create-and-tag requires --credentials')
+
+            self.credentials = self._is_valid_credentials_path(
+                self.parse_args.credentials[0])
+            if not self.credentials:
+                self.parser.error('Invalid credentials file')
+
+            self.users = self._is_valid_txt_file(self.parse_args.new[0])
+            if not self.users:
+                self.parser.error('Invalid text file')
 
     def _print_version(self) -> None:
         print(f'{self.NAME} v{self.VER}')
