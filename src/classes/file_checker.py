@@ -41,6 +41,11 @@ class FileChecker:
             return False
         return True
 
+    def is_writable(self) -> bool:
+        if not os.access(self.file, os.W_OK):
+            return False
+        return True
+
     def is_yaml(self) -> dict | bool:
         try:
             with open(self.file, 'r') as f:

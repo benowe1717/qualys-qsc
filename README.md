@@ -28,9 +28,9 @@ Create a file in the same directory as `main.py` called `.creds.yaml`
 Fill in the yaml file as:
 ```
 credentials:
-  username: ""
-  password: ""
-  host: "qualysapi.qg4.apps.qualys.com"
+  username: someuser
+  password: somepassword
+  host: qualysapi.qg4.apps.qualys.com
 ```
 
 You may want to update the base_url to match where your Qualys instance is
@@ -53,18 +53,18 @@ NOTE: Please ensure that each email address is on a separate line, one email add
 To use `Qualys QSC Hands-on Training`, follow these steps:
 
 - To test your credentials, run the program like this:
-`python3 main.py --test`
+`python3 main.py --test --credentials /path/to/credentials.yaml`
 
 This will show you if your credentials are valid or need updating.
 
 - To create users, run the program like this:
-`python3 main.py --create --file /some/path/to/your/users.txt`
+`python3 main.py --create /path/to/users.csv --credentials /path/to/credentials.yaml`
 
 - To create and tag users, run the program like this:
-`python3 main.py --create-and-tag --file /some/path/to/your/users.txt`
+`python3 main.py --create-and-tag /path/to/users.csv --credentials /path/to/credentials.yaml`
 
 - To reset a user's password, you can do something like this:
-`python3 main.py --reset-password quays1234 quays2345 quays3456`
+`python3 main.py --reset-password quays1234 quays2345 quays3456 --credentials /path/to/credentials.yaml`
 
 ## Contributing to Qualys QSC
 
@@ -88,12 +88,11 @@ Thanks to the following people who have contributed to this project:
 
 For help or support on this repository, follow these steps:
 
-- Link to the Issues tab for this repo
-- Link to the Asana form for this work
+- Fill out an issue [here](https://github.com/benowe1717/qualys-qsc/issues).
 
 ## License
 
-This project uses the following license: [qualys_license].
+This project uses the following license: [GPLv3](https://choosealicense.com/licenses/gpl-3.0/)
 
 ## Sources
 

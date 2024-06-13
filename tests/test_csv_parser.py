@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import os
+
 import pytest
 
 from src.classes.csv_parser import CsvParser
@@ -91,4 +93,26 @@ class TestCsvParser:
         assert len(row) == 11
         assert 'email' in row.keys()
         assert 'bowen@qualys.com' == row['email']
+        self.tearDown()
+
+    def test_write_csv(self):
+        self.setUp()
+        file = 'tests/data/users.csv'
+        parser = CsvParser(file)
+        url = 'https://url.com'
+        keys = ['email', 'username', 'password', 'url']
+        values = [{
+            'email': 'bowen@qualys.com',
+            'username': 'bowen',
+            'password': 'password1',
+            'url': url
+        }, {
+            'email': 'rarmstrong@qualys.com',
+            'username': 'rarmstrong',
+            'password': 'password2',
+            'url': url
+        }]
+        result = parser.write_csv(keys, values)
+        assert result is True
+        os.remove(file)
         self.tearDown()
