@@ -73,5 +73,18 @@ class CsvParser:
         except FileNotFoundError:
             return []
 
-    def write_csv(self, values: dict) -> None:
-        pass
+    def write_csv(self, keys: list, values: list) -> bool:
+        try:
+            with open(self.csv_file, 'w') as file:
+                writer = csv.writer(file, delimiter=',')
+                # Write Header
+                writer.writerow(keys)
+
+                # Write Rows
+                for value in values:
+                    row = [value[key] for key in keys]
+                    writer.writerow(row)
+
+            return True
+        except BaseException:
+            return False

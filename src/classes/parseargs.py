@@ -102,7 +102,7 @@ class ParseArgs:
             if not self.credentials:
                 self.parser.error('Invalid credentials file')
 
-            self.users = self._is_valid_txt_file(self.parse_args.new[0])
+            self.users = self._is_valid_txt_file(self.parse_args.create[0])
             if not self.users:
                 self.parser.error('Invalid text file')
 
@@ -133,7 +133,8 @@ class ParseArgs:
             if not self.credentials:
                 self.parser.error('Invalid credentials file')
 
-            self.users = self._is_valid_txt_file(self.parse_args.new[0])
+            self.users = self._is_valid_txt_file(
+                self.parse_args.create_and_tag[0])
             if not self.users:
                 self.parser.error('Invalid text file')
 
