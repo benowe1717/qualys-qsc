@@ -1,4 +1,5 @@
-requests
-pyyaml
-xmltodict
-mailmerge
+pytest==8.1.1
+PyYAML==5.4.1
+PyYAML==6.0.1
+Requests==2.32.3
+xmltodict==0.13.0
