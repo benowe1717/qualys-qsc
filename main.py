@@ -1,379 +1,197 @@
 #!/usr/bin/env python3
-import constants
-from parseargs import parseArgs
-from helper import helper
-from auth import qualysApiAuth
-from asset_tag import qualysApiAssetTag
-from user import qualysApiUser
-from asset import qualysApiAsset
-import csv, logging, os, sys, time
+import os
+import sys
 
-def create(users):
-    # This may seem like an unnecessary thing to repeat, however,
-    # since we try to use session-based authentication whenever possible,
-    # we want to ensure we are refreshing that active session before any
-    # critical work needs to be done to help minimize authentication issues
-    # in the middle of work
-    user = qualysApiUser()
-    h = helper()
+from src.classes.csv_parser import CsvParser
+from src.classes.mailmerge import MailMerge
+from src.classes.parseargs import ParseArgs
+from src.classes.qualys_api import QualysApi
 
-    errors = 0
-    successes = 0
-    logger = logging.getLogger(__name__)
-    logger.info(
-        "Starting user creation process..."
-    )
 
-    for u in users:
-        email = u.lower().strip()
-        result = user.addUser(email)
-        if not result:
-            errors += 1
-        else:
-            successes += 1
+def send_email() -> int:
+    send = input('Send welcome email to users? [Y/n] ').strip().lower()
+    if send == 'y':
+        return 1
+    elif send == 'n':
+        return 0
+    print('Invalid input, not sending welcome email...')
+    return 0
 
-    if errors > 0:
-        logger.error(
-            f"{errors} users were not able to be created! Please check "
-            "their details for accuracy!"
-        )
-        logger.error(
-            ", ".join(user.failed_users)
-        )
-    
-    if successes > 0:
-        logger.info(
-            f"{successes} users were created successfully!"
-        )
-        logger.info(
-            ", ".join(user.successful_users)
-        )
-
-    logger.info(
-        "User creation process is complete!"
-    )
-
-    h.writeCsv(user.user_details)
-
-    return user
-
-def createAndTag(users):
-    user = create(users)
-
-    logger = logging.getLogger(__name__)
-    logging.info(
-        "Starting the User and Asset Tagging process..."
-    )
-    tagging = qualysApiAssetTag()
-
-    result = tagging.searchTags()
-    if result and tagging.global_tag_id != -1:
-        tagging.updateGlobalTag(user.users_to_tag)
-    else:
-        tagging.createGlobalTag(user.users_to_tag)
-    result = tagging.searchTags()
-    tags = tagging.child_tags
-
-    failed_tags = []
-    successful_tags = []
-    tag_errors = 0
-    tag_successes = 0
-    for username in user.users_to_tag:
-        userid = user.searchUser(username)
-        while userid == -1:
-            logger.warning(
-                "Unable to locate the User's ID! This is probably "
-                "because the user was just created. Sleeping for "
-                "ten seconds and trying again..."
-            )
-            time.sleep(10)
-            userid = user.searchUser(username)
-
-        if userid != -1:
-            role_errors = 0
-            role_successes = 0
-            failed_roles = []
-            successful_roles = []
-            
-            for role in constants.ROLES:
-                result = user.applyRoleToUser(userid, role)
-                if result:
-                    role_successes += 1
-                    successful_roles.append(role)
-                else:
-                    role_errors += 1
-                    failed_roles.append(role)
-
-            result = tagging.tagUser(userid, username)
-            if result:
-                tag_successes += 1
-                successful_tags.append(username)
-            else:
-                tag_errors += 1
-                failed_tags.append(username)
-        else:
-            role_errors += 1
-            tag_errors += 1
-            failed_roles.append(role for role in constants.ROLES)
-            failed_tags.append(username)
-
-        if role_errors > 0:
-            logger.error(
-                f"{role_errors} roles were not able to be assigned to "
-                f"{username}!"
-            )
-            logger.error(
-                ", ".join(failed_roles)
-            )
-
-        if role_successes > 0:
-            logger.info(
-                f"{role_successes} roles were assigned successfully to "
-                f"{username}!"
-            )
-            logger.info(
-                ", ".join(successful_roles)
-            )
-
-    if tag_errors > 0:
-        logger.error(
-            f"{tag_errors} users were not able to be tagged!"
-        )
-        logger.error(
-            ", ".join(failed_tags)
-        )
-    
-    if tag_successes > 0:
-        logger.info(
-            f"{tag_successes} users were tagged successfully!"
-        )
-        logger.info(
-            ", ".join(successful_tags)
-        )
-
-    asset = qualysApiAsset()
-    asset.searchAssets(constants.NEEDLE)
-
-    i = 0
-    errors = 0
-    successes = 0
-    failed_assets = []
-    successful_assets = []
-
-    tag_count = len(tags)
-    asset_count = len(asset.assets_to_tag)
-
-    if tag_count > asset_count:
-        asset_list = asset.assets_to_tag
-        tag_list = tags[:asset_count]
-        working_count = asset_count
-    elif asset_count > tag_count:
-        asset_list = asset.assets_to_tag[:tag_count]
-        tag_list = tags
-        working_count = tag_count
-    else:
-        asset_list = asset.assets_to_tag
-        tag_list = tags
-        working_count = asset_count
-
-    if working_count > 0:
-        while i < working_count:
-            for key, value in asset_list[i].items():
-                assetid = key
-                assetname = value["name"]
-
-            for key, value in tag_list[i].items():
-                tagid = key
-                tagname = value["name"]
-
-            result = tagging.tagAsset(assetid, tagid)
-            if result:
-                successes += 1
-                successful_assets.append(assetname)
-            else:
-                errors += 1
-                failed_assets.append(assetname)
-            
-            i += 1
-
-    if errors > 0:
-        logger.error(
-            f"{errors} assets were not able to be tagged!"
-        )
-        logger.error(
-            ", ".join(failed_assets)
-        )
-
-    if successes > 0:
-        logger.info(
-            f"{successes} assets were tagged successfully!"
-        )
-        logger.info(
-            ", ".join(successful_assets)
-        )
-
-    logging.info(
-        "User and Asset Tagging process complete!"
-    )
 
 def main():
-    args = sys.argv
-    myparser = parseArgs(args)
-    debug = myparser.debug
+    args = sys.argv[1:]
+    parser = ParseArgs(args)
+    mailmerge_config = './src/configs/mailmerge_server.conf'
+    mailmerge_template = './src/configs/mailmerge_template.txt'
+    mailmerge_database = './data/mailmerge_database.csv'
 
-    logger = logging.getLogger()
-    if debug:
-        logger.setLevel(logging.DEBUG)
-    else:
-        logger.setLevel(logging.INFO)
+    if parser.action == 'test':
+        print('Starting test process...')
+        if not parser.credentials:
+            print('Invalid credentials file!')
+            exit(1)
 
-    formatter = logging.Formatter(constants.FORMAT)
+        qa = QualysApi(parser.credentials)  # type: ignore
+        result = qa.test()
+        if not result:
+            print('Invalid username/password or other error!')
+            exit(1)
 
-    sh = logging.StreamHandler(constants.STREAM)
-    sh.setFormatter(formatter)
-    logger.addHandler(sh)
+        print('Your credentials are valid!')
+        exit(0)
 
-    fh = logging.FileHandler(constants.LOG_FILE)
-    fh.setFormatter(formatter)
-    logger.addHandler(fh)
+    elif parser.action == 'create':
+        print('Starting new user creation process...')
+        csvparser = CsvParser(parser.users)  # type: ignore
+        rows = csvparser.read_csv()
+        send = send_email()
+        qa = QualysApi(parser.credentials)  # type: ignore
 
-    logger.info("Starting script...")
+        if len(rows) == 0:
+            print('No Users to add!')
+            exit(0)
 
-    if myparser.action == "test":
-        auth = qualysApiAuth()
-        logger.info(
-            "Success! Your credentials are valid!"
-        )
+        if send == 0:
+            try:
+                MailMerge(
+                    mailmerge_config,
+                    mailmerge_template,
+                    mailmerge_database)
+            except ValueError:
+                print('Unable to locate the proper MailMerge files, or',
+                      'the MailMerge files may be unconfigured!')
+                print('If you have not created these files, please run',
+                      'the following command:', 'mailmerge --sample')
+                print(
+                    'You will then need to update the constants file',
+                    'located at:',
+                    f'{os.path.realpath("./src/constants/constants.py")}')
+                exit(1)
 
-    elif myparser.action == "create":
-        lines = []
-        for f in myparser.files:
-            if not os.path.exists(f):
-                logger.error(
-                    f"Unable to locate file: {f}! "
-                    "Removing file from the list..."
-                )
-                myparser.files.remove(f)
+        i = 0
+        users = []
+        for row in rows:
+            email = row['email']
+            print(f'Creating user {email}...')
+            if send == 1:
+                row['send_email'] = 1
 
-            else:
-                h = helper()
-                result = h.readFile(f)
-                if not result:
-                    logger.error(
-                        f"Unable to read file: {f}! "
-                        "Removing file from the list..."
-                    )
-                    myparser.files.remove(f)
-
+            result = qa.add_user(**row)
+            if result:
+                if send == 1:
+                    user = {
+                        'email': email,
+                        'username': qa.user[i],
+                        'url': f'https://{qa.headers["Host"]}'}
                 else:
-                    lines.append(result)
+                    user = {
+                        'email': email,
+                        'username': qa.user[i][0],
+                        'password': qa.user[i][1],
+                        'url': f'https://{qa.headers["Host"]}'}
+                users.append(user)
+                i += 1
 
-        users = [user for line in lines for user in line]
-        create(users)
+        if len(qa.user) > 0:
+            print(f'{len(qa.user)} users created successfully!')
+            print(qa.user)
 
-        logger.info(
-            "All users that were successfully created have been written "
-            f"to the {constants.OUTPUT_FILE} file."
-        )
-        logger.info(
-            "Please ensure that you have installed the `mailmerge` utility "
-            "from the requirements.txt file"
-        )
-        logger.info(
-            "Please also ensure that you have configured your SMTP server "
-            "in the mailmerge_server.conf file"
-        )
-        logger.info(
-            "And finally confirm the email template is present "
-            "in the file mailmerge_template.txt"
-        )
-        logger.info(
-            "If all looks good, you can run "
-            "`mailmerge --no-limit --no-dry-run` to send out credentials "
-            "to all users!"
-        )
+        if len(qa.failed_user) > 0:
+            print(f'{len(qa.failed_user)} users were not created!')
+            print(qa.failed_user)
 
-    elif myparser.action == "create-and-tag":
-        lines = []
-        for f in myparser.files:
-            if not os.path.exists(f):
-                logger.error(
-                    f"Unable to locate file: {f}! "
-                    "Removing file from the list..."
-                )
-                myparser.files.remove(f)
+        if send == 0:
+            merge = MailMerge(
+                mailmerge_config,
+                mailmerge_template,
+                mailmerge_database)
+            merge.build_database(users)
 
-            else:
-                h = helper()
-                result = h.readFile(f)
-                if not result:
-                    logger.error(
-                        f"Unable to read file: {f}! "
-                        "Removing file from the list..."
-                    )
-                    myparser.files.remove(f)
+        else:
+            print(
+                'Welcome emails will now be sent to all successfully',
+                'created users!')
 
+        exit(0)
+
+    elif parser.action == 'tag':
+        print(
+            'This functionality is not currently implemented and is',
+            'coming soon!')
+        exit(0)
+
+    elif parser.action == 'reset':
+        print('Starting reset password process...')
+        send = send_email()
+
+        if send == 0:
+            try:
+                MailMerge(
+                    mailmerge_config,
+                    mailmerge_template,
+                    mailmerge_database)
+            except ValueError:
+                print('Unable to locate the proper MailMerge files, or',
+                      'the MailMerge files may be unconfigured!')
+                print('If you have not created these files, please run',
+                      'the following command:', 'mailmerge --sample')
+                print(
+                    'You will then need to update the constants file',
+                    'located at:',
+                    f'{os.path.realpath("./src/constants/constants.py")}')
+                exit(1)
+
+        qa = QualysApi(parser.credentials)  # type: ignore
+        print('Getting a list of all Users in your Qualys subscription...')
+        qa.list_users()
+        usernames = parser.users
+        i = 0
+        users = []
+        email = 'bademail@nodomain.com'
+        for username in usernames:  # type: ignore
+            print(f'Resetting password for {username}...')
+            for user_details in qa.users:
+                if username == user_details[0]:
+                    email = user_details[2]
+
+            result = qa.reset_password(username, send)
+            if result:
+                if send == 1:
+                    user = {
+                        'email': email,
+                        'username': qa.user[i],
+                        'url': f'https://{qa.headers["Host"]}'}
                 else:
-                    lines.append(result)
+                    user = {
+                        'email': email,
+                        'username': qa.user[i][0],
+                        'password': qa.user[i][1],
+                        'url': f'https://{qa.headers["Host"]}'}
+                users.append(user)
+                i += 1
 
-        users = [user for line in lines for user in line]
-        createAndTag(users)
+        if len(qa.user) > 0:
+            print(f'{len(qa.user)} user\'s password reset successfully!')
+            print(qa.user)
 
-        logger.info(
-            "All users that were successfully created have been written "
-            f"to the {constants.OUTPUT_FILE} file."
-        )
-        logger.info(
-            "Please ensure that you have installed the `mailmerge` utility "
-            "from the requirements.txt file"
-        )
-        logger.info(
-            "Please also ensure that you have configured your SMTP server "
-            "in the mailmerge_server.conf file"
-        )
-        logger.info(
-            "And finally confirm the email template is present "
-            "in the file mailmerge_template.txt"
-        )
-        logger.info(
-            "If all looks good, you can run "
-            "`mailmerge --no-limit --no-dry-run` to send out credentials "
-            "to all users!"
-        )
+        if len(qa.failed_user) > 0:
+            print(f'{len(qa.failed_user)} user\'s password were not reset!')
+            print(qa.failed_user)
 
-    elif myparser.action == "reset":
-        # Search the username first
-        # if it exists, reset its password
-        # else print out message that the 
-        # username cannot be found
-        for user in myparser.users:
-            logger.info(
-                f"Checking if {user} exists..."
-            )
-            myuser = qualysApiUser()
-            userid = myuser.searchUser(user)
-            if userid != -1:
-                password = myuser.resetPassword(user)
-                if password != -1:
-                    logger.info(
-                        f"Successfully reset {user}'s password! "
-                        f"The new password is: {password}"
-                    )
+        if send == 0:
+            merge = MailMerge(
+                mailmerge_config,
+                mailmerge_template,
+                mailmerge_database)
+            merge.build_database(users)
 
-                else:
-                    logger.error(
-                        f"Unable to reset {user}'s password!"
-                    )
+        else:
+            print(
+                'Password reset emails will now be sent to all',
+                'successful users!')
 
-            else:
-                logger.error(
-                    "Since we can't find this username, this script assumes" +
-                    " that it must be a typo or this user really doesn't " +
-                    "exist. There is nothing we can do, moving to the " +
-                    "next user..."
-                )
+        exit(0)
 
-    logger.info("Script finished!")
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

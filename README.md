@@ -28,11 +28,9 @@ Create a file in the same directory as `main.py` called `.creds.yaml`
 Fill in the yaml file as:
 ```
 credentials:
-  username: ""
-  password: ""
-
-api:
-  base_url: "qualysapi.qg4.apps.qualys.com"
+  username: someuser
+  password: somepassword
+  host: qualysapi.qg4.apps.qualys.com
 ```
 
 You may want to update the base_url to match where your Qualys instance is
@@ -46,27 +44,26 @@ You may want to update the base_url to match where your Qualys instance is
 ## Using
 
 There are two switches that are necessary to know:
-1. `-c/--create`: This will taken the given `users.txt` file and create a user for each record in the CSV
-2. `-a/--create-and-tag`: This will take the given `users.txt` file, create a user for each record in the CSV, create an asset tag using each user's username as the name, then apply the asset tag to the appropriate user, and apply the asset tag to a given asset/host
-3. `-r/--reset-password`: This will ask for a set of usernames (or a single username) and reset the password of that user
+1. `-c/--create`: This will taken the given CSV file and create a user for each record in the CSV
+2. `-r/--reset-password`: This will ask for a set of usernames (or a single username) and reset the password of that user
 
 NOTE: Please ensure that each email address is on a separate line, one email address per line!
 
 To use `Qualys QSC Hands-on Training`, follow these steps:
 
 - To test your credentials, run the program like this:
-`python3 main.py --test`
+`python3 main.py --test --credentials /path/to/credentials.yaml`
 
 This will show you if your credentials are valid or need updating.
 
 - To create users, run the program like this:
-`python3 main.py --create --file /some/path/to/your/users.txt`
+`python3 main.py --create /path/to/users.csv --credentials /path/to/credentials.yaml`
 
 - To create and tag users, run the program like this:
-`python3 main.py --create-and-tag --file /some/path/to/your/users.txt`
+`python3 main.py --create-and-tag /path/to/users.csv --credentials /path/to/credentials.yaml`
 
 - To reset a user's password, you can do something like this:
-`python3 main.py --reset-password quays1234 quays2345 quays3456`
+`python3 main.py --reset-password quays1234 quays2345 quays3456 --credentials /path/to/credentials.yaml`
 
 ## Contributing to Qualys QSC
 
@@ -90,12 +87,11 @@ Thanks to the following people who have contributed to this project:
 
 For help or support on this repository, follow these steps:
 
-- Link to the Issues tab for this repo
-- Link to the Asana form for this work
+- Fill out an issue [here](https://github.com/benowe1717/qualys-qsc/issues).
 
 ## License
 
-This project uses the following license: [qualys_license].
+This project uses the following license: [GPLv3](https://choosealicense.com/licenses/gpl-3.0/)
 
 ## Sources
 

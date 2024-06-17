@@ -1,0 +1,740 @@
+TO: email
+SUBJECT: Qualys Registration -- Start Now
+FROM: Qualys Inc <qsc@qualys.net>
+Content-Type: text/html
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- this doctype has the least inconsistencies according to http://www.emailology.org/#1 -->
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="x-apple-disable-message-reformatting">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="format-detection" content="date=no">
+    <meta name="format-detection" content="address=no">
+    <meta name="format-detection" content="email=no">
+    <style>
+        @import url(https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700);
+    </style>
+    <style type="text/css">
+        /**************************/
+        /* CLIENT-SPECIFIC STYLES */
+        /**************************/
+        #outlook a { /* Force Outlook to provide a "view in browser" menu link. */
+            padding:0;
+        }
+        a[href^="x-apple-data-detectors:"] {
+            color: inherit;
+            text-decoration: none;
+        }
+        body { /* Prevent Webkit and Windows Mobile platforms from changing default font sizes, while not breaking desktop design. */
+            width:100% !important;
+            -webkit-text-size-adjust:100%;
+            -ms-text-size-adjust:100%;
+            margin:0;
+            padding:0;
+        }
+        body,
+        li:before,
+        .ui-widget,
+        input,
+        textarea {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+        .ExternalClass { /* Force Hotmail to display emails at full width */
+            width:100%;
+        }
+        .ExternalClass,
+        .ExternalClass p,
+        .ExternalClass span,
+        .ExternalClass font,
+        .ExternalClass td,
+        .ExternalClass div { /* Force Hotmail to display normal line spacing.  More on that: http://www.emailonacid.com/forum/viewthread/43/ */
+            line-height: 100%;
+        }
+        #backgroundTable {
+            margin:0;
+            padding:0;
+            width:100% !important;
+            line-height: 100% !important;
+        }
+        font {
+            display: block;
+        }
+        .nowrap {
+            white-space: nowrap;
+        }
+
+        /* https://css-tricks.com/snippets/css/prevent-long-urls-from-breaking-out-of-container/ */
+        .text-link,
+        .long-text {
+            /* These are technically the same, but use both */
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+
+            -ms-word-break: break-all;
+            /* This is the dangerous one in WebKit, as it breaks things wherever */
+            word-break: break-all;
+            /* Instead use this non-standard one: */
+            word-break: break-word;
+
+            /* Adds a hyphen where the word breaks, if supported (No Blink) */
+            -ms-hyphens: auto;
+            -moz-hyphens: auto;
+            -webkit-hyphens: auto;
+            hyphens: auto;
+        }
+
+        /**************************/
+        /* RESET IMAGES           */
+        /**************************/
+        img {
+            outline:none;
+            text-decoration:none;
+            border: none;
+            -ms-interpolation-mode: bicubic; /* works to help ie properly resize images in IE. (if you are resizing them using the width and height attributes)*/
+        }
+        a img {
+            border:none; /* removes border when linking images */
+        }
+        .image_fix {
+            display:block; /* add this class to images that show extra space below them */
+        }
+        img.banner {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /**************************/
+        /* RESET PARAGRAPHS       */
+        /**************************/
+        p,
+        li {
+            margin: 0;
+            color: #6A778B;
+            font-size: 15px;
+            line-height: 1.625;
+        }
+        a.text-link {
+            color: #2e8be0;
+            text-decoration: none;
+        }
+
+        /**************************/
+        /* RESET HEADINGS         */
+        /**************************/
+        /* To minimize inconsistencies, don't use heading tags (h1, h2, h3, h4, h5, h6). Instead, use span tags with a class indicating its heading level. */
+        span.h1 {
+            /* define h1 style here */
+        }
+        span.h2 {
+            /* define h1 style here */
+        }
+        span.h3 {
+            /* define h1 style here */
+        }
+        span.h4 {
+            /* define h1 style here */
+        }
+        span.h5 {
+            /* define h1 style here */
+        }
+        span.h6 {
+            /* define h1 style here */
+        }
+
+        /**************************/
+        /* RESET TABLES, CELLS    */
+        /**************************/
+        table td {
+            border-collapse: collapse;
+            padding: 0;
+        }
+        table {
+            border-collapse:collapse;
+            mso-table-lspace:0pt;
+            mso-table-rspace:0pt;
+            padding: 0;
+            border-spacing: 0;
+        }
+        /**************************/
+        /* PREHEADER              */
+        /**************************/
+        div.preheader,
+        div.preheader font { /* prevents users from seeing the "If you're having trouble viewing this message, click here" message in their inbox */
+            display: none;
+            visibility: hidden;
+            color: #255496;
+            background-color: #255496;
+        }
+        /**************************/
+        /* OTHER                 */
+        /**************************/
+        .background-table {
+            border-collapse: collapse;
+            background-color: #EDEEED;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            line-height: 100% !important;
+        }
+        .wrapper-table {
+            max-width: 684px;
+            width: 684px;
+        }
+        .showOnMobile {
+            display: none;
+        }
+        .address a {
+            color: #2E8BE0;
+        }
+        .button a {
+            font-size: 16px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 3px;
+            padding: 11px 18px;
+            border: 1px solid #ED2E26;
+            display: inline-block;
+            white-space: nowrap;
+        }
+        sup {
+            font-size: 0.6em;
+        }
+        /*********************************/
+        /* RESPONSIVE STYLES             */
+        /*********************************/
+        @media screen and (max-width:683px) {
+
+        }
+        /* 414px MAX WIDTH OF MOBILE */
+        @media screen and (max-width:414px) {
+            /* OVERRIDE per-page CSS
+               Nick wants text margins on mobile to be 20px on all emails */
+            .mailer-padding.mailer-padding {
+                width: 20px !important;
+                min-width: 20px !important;
+            }
+        }
+    </style>
+
+    <style type="text/css">
+        a {
+            font-family: 'Open Sans', 'Segoe UI', 'Robot', 'Ubuntu', sans-serif;
+        }
+        .master-table {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            line-height: 100%;
+            border-collapse: collapse;
+            background-color: #EDEEED;
+        }
+        .mailer-table {
+            background: #ffffff;
+        }
+        .mailer-padding {
+            width: 76px;
+        }
+        .mailer-heading {
+            color: #262626;
+            font-weight: 600;
+            font-size: 37.5px;
+            line-height: 1.3;
+            letter-spacing: -0.15px;
+            font-family: 'Open Sans', 'Segoe UI', 'Robot', 'Ubuntu', sans-serif;
+            text-align: center;
+        }
+        .mailer-subheading {
+            color: #6E7E96;
+            font-size: 32.65px;
+            line-height: 1.25;
+            font-weight: 300;
+            letter-spacing: -0.5px;
+            text-align: center;
+        }
+        . {
+            color: #647197;
+            font-weight: 400;
+            font-size: 15.35px;
+            line-height: 1.55;
+            font-family: 'Open Sans', 'Segoe UI', 'Robot', 'Ubuntu', sans-serif;
+        }
+        . strong {
+            font-weight: 600;
+        }
+        .app-badge-td {
+            text-align: left;
+            vertical-align: top;
+            width: 100px;
+        }
+        .app-badge {
+            display: block;
+            max-width: 100%;
+            margin-top: 7px;
+        }
+        .mail-link {
+            color: #2E8BE0;
+            text-decoration: none;
+        }
+        .email-phone,
+        .email-phone a {
+            white-space: nowrap;
+            color: #647197 !important;
+            text-decoration: none !important;
+        }
+        .email-address a {
+            color: #707f93 !important;
+            text-decoration: none !important;
+        }
+        .heading--3 {
+            font-size: 26px;
+            font-weight: 600;
+            color: #262626;
+        }
+        p,
+        li {
+            font-size: 16px;
+            color: #6A778B;
+            line-height: 1.5em;
+        }
+        ul {
+            padding-left: 1em;
+        }
+        li {
+            margin-bottom: 0;
+        }
+        hr {
+            border-top: 1px solid #F2F2F3;
+            border-bottom: 1px solid #F2F2F3;
+            margin: 2em 0;
+        }
+        .center {
+            text-align: center;
+        }
+        .resources a {
+            color: #6A778B;
+        }
+        /*********************************/
+        /* RESPONSIVE STYLES             */
+        /*********************************/
+        @media screen and (max-width:683px) {
+            .mailer-table {
+                width: 100% !important;
+            }
+            .mailer-padding {
+                width: 30px !important;
+            }
+            .mailer-heading {
+                font-size: 1.8em !important;
+                line-height: 1.3 !important;
+            }
+            .mailer-subheading {
+                font-size: 1.6em !important;
+                line-height: 1.25 !important;
+            }
+            .app-badge-td {
+                width: 50px !important;
+            }
+            table.wrapper,
+            .wrapper-table {
+                width: 100% !important;
+            }
+            .mobile_width{
+                width: 90% !important;
+                margin: auto;
+            }
+            .mobile_logo{
+                text-align: center;
+            }
+            .m_table tr th{
+                display: block !important;
+                padding: 10px 20px 10px 20px !important;
+            }
+            .m_table_row{
+                margin-bottom: 30px !important;
+            }
+            .m_table_row_first{
+                margin-top: 20px !important;
+            }
+        }
+        @media screen and (max-width:414px) {
+            .no-column {
+                display: none;
+            }
+        }
+        @media screen and (min-width:684px) {
+            .hideondesktop{
+                display:none
+            }
+
+        }
+    </style>
+
+
+    <!-- http://templates.mailchimp.com/development/css/outlook-conditional-css/
+        Target Outlook 2007, 2010 and 2013
+        The first font in the list of fonts MUST be available on the client's machine in order for the font-family to work. -->
+    <!--[if gte mso 12]>
+    <style type="text/css">
+        body, td, p, h2, h1, ul, li, span { font-family: 'Lucida Grande', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif !important; }
+    </style>
+    <![endif]-->
+
+</head>
+<body>
+
+
+<div class="preheader">
+    <span style="font-family:'Open Sans', sans-serif;">Welcome Email â€“ Qualys Web Application Security Service</span>
+</div>
+
+<table cellpadding="0" cellspacing="0" border="0" class="background-table">
+    <tr>
+        <td align="center">
+            <table cellpadding="0" cellspacing="0" border="0" class="wrapper-table" align="center">
+                <tr>
+                    <td>
+
+                        <table cellpadding="0" cellspacing="0" border="0" style="background-color:#fff;width:100%;">
+                            <tr>
+                                <td>
+                                    <table cellpadding="0" cellspacing="0" border="0" class="mailer-table">
+                                        <tr class="hideOnMobile">
+                                            <td height="38"></td>
+                                        </tr>
+                                        <!--[if !mso 9]><!-->
+                                        <tr class="showOnMobile">
+                                            <td height="30"></td>
+                                        </tr>
+                                        <!--<![endif]-->
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <table cellpadding="0" cellspacing="0" border="0" class="mailer-table" >
+                                        <tr>
+
+                                            <td align="left" valign="top" style="padding:0 40px" class="mobile_logo">
+                                                <a
+                                                        href="https://www.qualys.com/">
+                                                    <img src="https://d1dejaj6dcqv24.cloudfront.net/images/emails/webcasts/qualys-logo-145-2x.png"
+                                                         width="145" class="qualys-logo">
+                                                </a>
+                                            </td>
+
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td height="25"></td>
+                            </tr>
+                            <tr>
+                                <td align="center" style="font-size: 15px; color: #262626; line-height: 23px; font-family: 'Open Sans', Arial, sans-serif;">
+                                    <table cellpadding="0" cellspacing="0" border="0" width="600" style="width:600px;margin:auto" class="mobile_width">
+                                        <tr>
+                                            <td align="center" style="font-size:28px; color: #262626; line-height: 23px; font-family: 'Open Sans', Arial, sans-serif;padding-top:15px;font-weight:600;padding-top:10px">
+                                                Welcome to Qualys</td></tr>
+                                        <tr>
+                                            <td align="left" style="font-size: 15px; color: #262626; line-height: 23px; font-family: 'Open Sans', Arial, sans-serif;padding-top:35px">
+                                                Hello username,
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td height="20"></td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left" style="font-size: 15px; color: #262626; line-height: 23px; font-family: 'Open Sans', Arial, sans-serif;">
+                                                We appreciate your interest in Qualys! We're happy that you've taken the first step towards securing your organization with Qualys Cloud Platform.
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left" style="font-size: 15px; color: #262626; line-height: 23px; font-family: 'Open Sans', Arial, sans-serif;padding-top:20px">
+                                                Here are the important details you will need to activate your account as well as for future logins:
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left" style="font-size: 15px; color: #262626; line-height: 23px; font-family: 'Open Sans', Arial, sans-serif;padding-top:35px">
+                                                <table cellspacing="0" cellpadding="0" border="0" style="width:100%;background-color:#F7FAFC;">
+                                                    <tr>
+                                                        <td>
+                                                            <table cellspacing="0" cellpadding="0" border="0" width="100%" class="m_table">
+                                                                <tr> <th align="left" valign="top" width="130" style="padding:30px 10px 12px 30px" class="m_table_row_first"><strong>Username</strong></th>
+                                                                    <th align="left" valign="middle" style="padding-left:0px;padding:20px 0 0px 0;font-weight:400"> <strong>username</strong> </th></tr>
+                                                            </table>
+                                                        </td>
+
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <table cellspacing="0" cellpadding="0" border="0" width="100%" class="m_table">
+                                                                <tr> <th align="left" valign="top" width="130" style="padding:10px 10px 12px 30px"><strong>Password</strong></th>
+                                                                    <th align="left" valign="middle" style="padding-left:0px;padding:10px 0 0px 0;font-weight:400"> <strong>password}}</strong></th></tr>
+                                                            </table>
+                                                        </td>
+
+                                                    </tr>
+
+                                                                                                        <tr>
+                                                        <td>
+                                                            <table cellspacing="0" cellpadding="0" border="0" width="100%" class="m_table">
+                                                                <tr> <th align="left" valign="top" width="130" style="padding:10px 10px 32px 30px"><strong>Platform URL</strong></th>
+                                                                    <th align="left" valign="middle" style="padding-left:10px;padding:10px 0 30px 0;font-weight:400" class="m_table_row">
+                                                                        <a href="url"  style="color: #2E8BE0; text-decoration: none;"><strong>url</strong></a>
+                                                                        <br> Save this URL to easily access your Qualys subscription and reset your password. </th></tr>
+                                                            </table>
+                                                        </td>
+
+                                                    </tr>
+                                                    <tr>
+
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr>
+                                            <td align="left" style="padding-top:30px">
+                                                <table  cellspacing="0" cellpadding="0" border="0" style="width:100%;background-color:#F7FAFC;" bgcolor="#F7FAFC">
+                                                    <tr>
+                                                        <td valign="top" width="20" style="padding-left: 25px;font-size:26px;line-height:28px;color:#262626;padding-top:22px">&bull;</td>
+                                                        <td align="left" valign="top" style="padding: 24px 30px 0px 5px;font-size: 15px; color: #262626; line-height: 23px; font-family: 'Open Sans', Arial, sans-serif;">
+                                                            Please keep this email for future reference in case you forget your username or need to reset your password. </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td width="20" valign="top" style="padding-left: 25px;font-size:26px;line-height:28px;color:#262626;padding-top:6px">&bull;</td>
+                                                        <td align="left" valign="middle" style="padding: 10px 30px 20px 5px;font-size: 15px; color: #262626; line-height: 23px; font-family: 'Open Sans', Arial, sans-serif;">
+                                                            For your convenience, we recommend you bookmark your platform URL.</td></tr>
+
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr>
+                                            <td align="left" valign="top" style="font-size: 15px; color: #262626; line-height: 23px; font-family: 'Open Sans', Arial, sans-serif;padding-top:30px">
+                                                Thank you for choosing Qualys.
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left" valign="top" style="font-size: 15px; color: #262626; line-height: 23px; font-family: 'Open Sans', Arial, sans-serif;padding-top:30px">
+                                                Your Qualys Team
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left" valign="top" style="font-size: 15px; color: #262626; line-height: 23px; font-family: 'Open Sans', Arial, sans-serif;padding-top:40px">
+                                                <table cellspacing="0" cellpadding="0" border="0" style="background-color:#F7FAFC;" width="100%">
+                                                    <tr>
+                                                        <td style="padding:30px 0px 20px 0px;text-decoration:none;display:inline-block;width:100%" width="100%" align="center">USA <a href="tel:+16508016161" style="color: #2E8BE0;display:inline-block; text-decoration: none;">+1(650)801 6161</a> / <a href="tel:+18668016161" style="color: #2E8BE0;display:inline-block; text-decoration: none;">+1(866)8016161</a> <br>
+                                                            <strong>Global support : </strong>
+
+                                                            <a href="https://www.qualys.com/support/"  style="color: #2E8BE0; text-decoration: none;">www.qualys.com/support </a></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td align="center" style="padding-bottom:30px"><a href="https://www.qualys.com/"  style="color: #2E8BE0; text-decoration: none;">www.qualys.com</a></td>
+                                                    </tr>
+                                                </table>
+
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr class="left-aligned">
+                                <td>
+                                    <table cellpadding="0" cellspacing="0" border="0" class="highlight-table-inner" width="100%">
+                                        </td>
+                                        <td class="mailer-padding">&nbsp;</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td height="60"></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: #EDEEED;">
+                                    <table cellpadding="0" cellspacing="0" border="0" align="center">
+                                        <tr>
+                                            <td height="40"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <table cellpadding="0" cellspacing="0" border="0" align="center">
+                                                    <tr>
+                                                        <td>
+                                                            <a href="https://twitter.com/qualys">
+                                                                <img src="https://ik.imagekit.io/qualys/image/2018/rsa/mailer-twitter-icon-34-2x.jpg"
+                                                                     width="37">
+                                                            </a>
+                                                        </td>
+                                                        <td width="10" style="width: 10px;"></td>
+                                                        <td>
+                                                            <a href="https://www.facebook.com/qualys">
+                                                                <img src="https://ik.imagekit.io/qualys/image/2018/rsa/mailer-facebook-icon-34-2x.jpg"
+                                                                     width="37">
+                                                            </a>
+                                                        </td>
+                                                        <td width="10" style="width: 10px;"></td>
+                                                        <td>
+                                                            <a href="https://www.linkedin.com/company/qualys">
+                                                                <img src="https://ik.imagekit.io/qualys/image/2018/rsa/mailer-linkedin-icon-34-2x.jpg"
+                                                                     width="37">
+                                                            </a>
+                                                        </td>
+                                                        <td width="10" style="width: 10px;"></td>
+                                                        <td>
+                                                            <a href="https://vimeo.com/qualys">
+                                                                <img src="https://d1dejaj6dcqv24.cloudfront.net/asset/image/icon/vimeo-circle-37-2x.png"
+                                                                     width="37">
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td height="13" style="background-color: #EDEEED;"></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <table style="background-color: #EDEEED; width: 100%;" class="footer">
+                                        <tr>
+                                            <td width="30"></td>
+                                            <td>
+                                                <table style="width: 100%;">
+                                                    <tr>
+                                                        <td>
+                                                            <table cellpadding="0" cellspacing="0" border="0" align="center">
+                                                                <tr>
+                                                                    <td align="center" style="line-height: 1.4;">
+                                                                        <font face="'Open Sans', sans-serif">
+
+                                                                        </font>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td height="16"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <table cellpadding="0" cellspacing="0" border="0" align="center"
+                                                                   style="text-align: center;">
+                                                                <tr>
+                                                                    <td class="mailer-footer-links" style="text-align: center;">
+                                                                        <a href="https://www.qualys.com/company/privacy/?utm_source={}&utm_medium={}&utm_campaign={}&utm_term={}&leadsource={}/"
+                                                                           style="text-decoration: none; color: #2e8be0">
+                                                                            <font face="'Open Sans', sans-serif"
+                                                                                  style="font-family: 'Open Sans', sans-serif; font-size: 11pt;  display: inline;">
+                                                                                Privacy</font>
+                                                                        </a>
+                                                                        <font face="'Open Sans', sans-serif"
+                                                                              style="font-family: 'Open Sans', sans-serif; font-size: 11pt; color: #707f93; display: inline;">
+                                                                            |</font>
+
+                                                                        <a href="https://www.qualys.com/company/contacts/"
+                                                                           style="text-decoration: none; color: #707f93; display: inline;">
+                                                                            <font face="'Open Sans', sans-serif"
+                                                                                  style="font-family: 'Open Sans', sans-serif; font-size: 11pt; color: #2e8be0 ;display: inline;">
+                                                                                Contacts</font>
+                                                                        </a>
+                                                                        <font face="'Open Sans', sans-serif"
+                                                                              style="font-family: 'Open Sans', sans-serif; font-size: 11pt; color: #707f93;  display: inline;">
+                                                                            |</font>
+
+                                                                        <a href="https://www.qualys.com/support/"
+                                                                           style="text-decoration: none; color: #2e8be0">
+                                                                            <font face="'Open Sans', sans-serif"
+                                                                                  style="font-family: 'Open Sans', sans-serif; font-size: 11pt;  display: inline;">
+                                                                                Support</font>
+                                                                        </a>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td height="16"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <table cellpadding="0" cellspacing="0" border="0" align="center">
+                                                                <tr>
+                                                                    <td align="center" style="line-height: 1.4;">
+                                                                        <font face="'Open Sans', sans-serif"
+                                                                              style="font-family: 'Open Sans', sans-serif; font-size: 10.5pt; color: #707f93">
+<span class="address">
+<span style="white-space: nowrap;"><a
+            style="color: #707f93;">919 E Hillsdale Blvd,</a></span>
+<span style="white-space: nowrap;"><a
+            style="color: #707f93;">4th Floor,</a></span>
+<span style="white-space: nowrap;"><a
+            style="color: #707f93;">Foster City,</a></span>
+<a style="color: #707f93;">CA 94404</a> |
+<span style="white-space: nowrap;"><a
+            style="color: #707f93;">(650) 801 6100</a></span>
+</span>
+                                                                            <br><br class="showOnMobile">
+
+                                                                            Qualys is a global company with offices around the world. Find an <a
+                                                                                    href="https://www.qualys.com/company/contacts/?utm_source={}&utm_medium={}&utm_campaign={}&utm_term={}&leadsource={}#regional-offices"
+                                                                                    style="text-decoration: none; color: #2e8be0; white-space: nowrap;">office
+                                                                                near you</a>.
+                                                                        </font>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td height="18"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <table cellpadding="0" cellspacing="0" border="0" align="center">
+                                                                <tr>
+                                                                    <td align="center">
+                                                                        <font face="'Open Sans', sans-serif"
+                                                                              style="font-family: 'Open Sans', sans-serif; font-size: 10.5pt; color: #707f93">
+                                                                            Â© 2023<span class="nowrap">Qualys, Inc.</span> All
+                                                                            rights reserved.</font>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td height="100"></td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                            <td width="30"></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+
+</body>
+</html>
