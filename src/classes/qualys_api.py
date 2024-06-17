@@ -415,10 +415,14 @@ class QualysApi:
 
         result = self._validate_payload_values(payload)
         if not result:
+            error = (payload, 400, 'Invalid required field(s)')
+            self.failed_user.append(error)
             return False
 
         result = self._validate_optional_payload_values(payload)
         if not result:
+            error = (payload, 400, 'Invalid optional field(s)')
+            self.failed_user.append(error)
             return False
 
         endpoint = '/msp/user.php'
@@ -453,10 +457,14 @@ class QualysApi:
     def reset_password(self, username: str, email: int) -> bool:
         result = self._is_valid_username_format(username)
         if not result:
+            error = (username, 400, 'Invalid username format')
+            self.failed_user.append(error)
             return False
 
         result = self._is_valid_send_email(email)
         if not result:
+            error = (email, 400, 'Invalid email option')
+            self.failed_user.append(error)
             return False
 
         payload = {
