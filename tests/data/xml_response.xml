@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE USER_OUTPUT SYSTEM "https://qualysapi.qg4.apps.qualys.com/user_output.dtd">
+<!-- This report was generated with an evaluation version of Qualys //--> 
+<USER_OUTPUT>
+  <API name="user.php" username="fakeuser" at="2024-06-06T21:00:52Z" />
+  <RETURN status="SUCCESS">
+    <MESSAGE>quays6qt84 user has been successfully created.</MESSAGE>
+  </RETURN>
+  <USER>
+    <USER_LOGIN>quays6qt84</USER_LOGIN>
+    <PASSWORD>lWby3dX#</PASSWORD>
+  </USER>
+</USER_OUTPUT>
+<!-- This report was generated with an evaluation version of Qualys //--> 
+<!-- CONFIDENTIAL AND PROPRIETARY INFORMATION. Qualys provides the QualysGuard Service "As Is," without any warranty of any kind. Qualys makes no warranty that the information contained in this report is complete or error-free. Copyright 2024, Qualys, Inc. //-->

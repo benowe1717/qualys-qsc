@@ -1,0 +1,7 @@
+.pytest_cache/
+__pycache__/
+*.log
+data/credentials.yaml
+data/users.csv
+data/new_users.csv
+data/mailmerge_database.csv
