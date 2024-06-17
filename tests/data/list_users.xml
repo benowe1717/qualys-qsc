@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE USER_LIST_OUTPUT SYSTEM "https://qualysapi.qg4.apps.qualys.com/user_list_output.dtd">
+<!-- This report was generated with an evaluation version of Qualys //--> 
+<USER_LIST_OUTPUT>
+  <USER_LIST>
+    <USER>
+      <USER_LOGIN>quays4la3</USER_LOGIN>
+      <USER_ID>1387042</USER_ID>
+      <CONTACT_INFO>
+        <FIRSTNAME><![CDATA[FirstName]]></FIRSTNAME>
+        <LASTNAME><![CDATA[LastName]]></LASTNAME>
+        <TITLE><![CDATA[Title]]></TITLE>
+        <PHONE><![CDATA[000000]]></PHONE>
+        <FAX><![CDATA[]]></FAX>
+        <EMAIL><![CDATA[test@test.com]]></EMAIL>
+        <COMPANY><![CDATA[Company]]></COMPANY>
+        <ADDRESS1><![CDATA[Foster City, CA 94404]]></ADDRESS1>
+        <ADDRESS2><![CDATA[]]></ADDRESS2>
+        <CITY><![CDATA[Foster City, CA 94404]]></CITY>
+        <COUNTRY>United States of America</COUNTRY>
+        <STATE></STATE>
+        <ZIP_CODE><![CDATA[94065]]></ZIP_CODE>
+        <TIME_ZONE_CODE><![CDATA[Auto]]></TIME_ZONE_CODE>
+      </CONTACT_INFO>
+      <USER_STATUS>Active</USER_STATUS>
+      <CREATION_DATE>2023-08-25T06:58:49Z</CREATION_DATE>
+      <LAST_LOGIN_DATE>2024-05-23T10:53:55Z</LAST_LOGIN_DATE>
+      <USER_ROLE>Manager</USER_ROLE>
+      <BUSINESS_UNIT><![CDATA[Unassigned]]></BUSINESS_UNIT>
+      <UNIT_MANAGER_POC>0</UNIT_MANAGER_POC>
+      <MANAGER_POC>1</MANAGER_POC>
+      <UI_INTERFACE_STYLE>standard_blue</UI_INTERFACE_STYLE>
+      <PERMISSIONS>
+        <CREATE_OPTION_PROFILES>1</CREATE_OPTION_PROFILES>
+        <PURGE_INFO>1</PURGE_INFO>
+        <ADD_ASSETS>1</ADD_ASSETS>
+        <EDIT_REMEDIATION_POLICY>1</EDIT_REMEDIATION_POLICY>
+        <EDIT_AUTH_RECORDS>1</EDIT_AUTH_RECORDS>
+      </PERMISSIONS>
+      <NOTIFICATIONS>
+        <LATEST_VULN>none</LATEST_VULN>
+        <MAP>ags</MAP>
+        <SCAN>ags</SCAN>
+        <DAILY_TICKETS>0</DAILY_TICKETS>
+      </NOTIFICATIONS>
+    </USER>
+    <USER>
+      <USER_LOGIN>quays5ty3</USER_LOGIN>
+      <USER_ID>1387042</USER_ID>
+      <CONTACT_INFO>
+        <FIRSTNAME><![CDATA[FirstName]]></FIRSTNAME>
+        <LASTNAME><![CDATA[LastName]]></LASTNAME>
+        <TITLE><![CDATA[Title]]></TITLE>
+        <PHONE><![CDATA[000000]]></PHONE>
+        <FAX><![CDATA[]]></FAX>
+        <EMAIL><![CDATA[test@test.com]]></EMAIL>
+        <COMPANY><![CDATA[Company]]></COMPANY>
+        <ADDRESS1><![CDATA[Foster City, CA 94404]]></ADDRESS1>
+        <ADDRESS2><![CDATA[]]></ADDRESS2>
+        <CITY><![CDATA[Foster City, CA 94404]]></CITY>
+        <COUNTRY>United States of America</COUNTRY>
+        <STATE></STATE>
+        <ZIP_CODE><![CDATA[94065]]></ZIP_CODE>
+        <TIME_ZONE_CODE><![CDATA[Auto]]></TIME_ZONE_CODE>
+      </CONTACT_INFO>
+      <USER_STATUS>Active</USER_STATUS>
+      <CREATION_DATE>2023-08-25T06:58:49Z</CREATION_DATE>
+      <LAST_LOGIN_DATE>2024-05-23T10:53:55Z</LAST_LOGIN_DATE>
+      <USER_ROLE>Manager</USER_ROLE>
+      <BUSINESS_UNIT><![CDATA[Unassigned]]></BUSINESS_UNIT>
+      <UNIT_MANAGER_POC>0</UNIT_MANAGER_POC>
+      <MANAGER_POC>1</MANAGER_POC>
+      <UI_INTERFACE_STYLE>standard_blue</UI_INTERFACE_STYLE>
+      <PERMISSIONS>
+        <CREATE_OPTION_PROFILES>1</CREATE_OPTION_PROFILES>
+        <PURGE_INFO>1</PURGE_INFO>
+        <ADD_ASSETS>1</ADD_ASSETS>
+        <EDIT_REMEDIATION_POLICY>1</EDIT_REMEDIATION_POLICY>
+        <EDIT_AUTH_RECORDS>1</EDIT_AUTH_RECORDS>
+      </PERMISSIONS>
+      <NOTIFICATIONS>
+        <LATEST_VULN>none</LATEST_VULN>
+        <MAP>ags</MAP>
+        <SCAN>ags</SCAN>
+        <DAILY_TICKETS>0</DAILY_TICKETS>
+      </NOTIFICATIONS>
+    </USER>
+  </USER_LIST>
+</USER_LIST_OUTPUT>
+<!-- This report was generated with an evaluation version of Qualys //--> 
+<!-- CONFIDENTIAL AND PROPRIETARY INFORMATION. Qualys provides the QualysGuard Service "As Is," without any warranty of any kind. Qualys makes no warranty that the information contained in this report is complete or error-free. Copyright 2024, Qualys, Inc. //--> 

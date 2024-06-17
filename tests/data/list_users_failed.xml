@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE USER_OUTPUT SYSTEM "https://qualysapi.qg4.apps.qualys.com/user_output.dtd">
+<!-- This report was generated with an evaluation version of Qualys //--> 
+<USER_LIST_OUTPUT>
+  <API name="user.php" username="lorem" at="2024-06-06T20:45:47Z" />
+  <RETURN status="FAILED" number="1903">
+    <MESSAGE><![CDATA[Lorem ipsum fake error message]]></MESSAGE>
+  </RETURN>
+</USER_LIST_OUTPUT>
+<!-- This report was generated with an evaluation version of Qualys //--> 
+<!-- CONFIDENTIAL AND PROPRIETARY INFORMATION. Qualys provides the QualysGuard Service "As Is," without any warranty of any kind. Qualys makes no warranty that the information contained in this report is complete or error-free. Copyright 2024, Qualys, Inc. //-->

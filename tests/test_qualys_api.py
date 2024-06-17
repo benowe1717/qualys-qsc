@@ -82,6 +82,12 @@ class TestQualysApi:
         assert self.qa.user == []
         self.tearDown()
 
+    def test_users_on_startup(self):
+        self.setUp()
+        assert isinstance(self.qa.users, list)
+        assert len(self.qa.users) == 0
+        self.tearDown()
+
     def test_basic_auth(self):
         self.setUp()
         result = HTTPBasicAuth(
@@ -859,4 +865,156 @@ class TestQualysApi:
         assert isinstance(self.qa.user[0], tuple)
         assert self.qa.user[0][0] == 'quays6qt84'
         assert self.qa.user[0][1] == 'lWby3dX#'
+        self.tearDown()
+
+    def test_is_valid_username_format_failed(self):
+        self.setUp()
+        username = 'my_username'
+        result = self.qa._is_valid_username_format(username)
+        assert result is False
+        self.tearDown()
+
+    def test_is_valid_username_format(self):
+        self.setUp()
+        username = 'quays7cx25'
+        result = self.qa._is_valid_username_format(username)
+        assert result is True
+        self.tearDown()
+
+    def test_reset_password_failed_unauthenticated(self, requests_mock):
+        self.setUp()
+        username = 'quays8dy36'
+        email = 0
+        endpoint = '/msp/password_change.php'
+        host = constants.QUALYS_API_SCHEME + self.qa.headers['Host']
+        url = host + endpoint
+        status_code = 401
+        requests_mock.register_uri(
+            'POST', url, text='ACCESS DENIED', status_code=status_code)
+        result = self.qa.reset_password(username, email)
+        assert result is False
+        assert len(self.qa.failed_user) == 1
+        self.tearDown()
+
+    def test_reset_password_failed(self, requests_mock):
+        self.setUp()
+        username = 'quays8dy36'
+        email = 0
+        endpoint = '/msp/password_change.php'
+        host = constants.QUALYS_API_SCHEME + self.qa.headers['Host']
+        url = host + endpoint
+        status_code = 200
+        with open('tests/data/password_change_failed.xml', 'r') as file:
+            data = file.read()
+        requests_mock.register_uri(
+            'POST', url, text=data, status_code=status_code)
+        result = self.qa.reset_password(username, email)
+        assert result is False
+        assert len(self.qa.failed_user) == 1
+        self.tearDown()
+
+    def test_reset_password_single_user_send_email(self, requests_mock):
+        self.setUp()
+        username = 'quays7cx25'
+        email = 1
+        endpoint = '/msp/password_change.php'
+        host = constants.QUALYS_API_SCHEME + self.qa.headers['Host']
+        url = host + endpoint
+        status_code = 200
+        with open('tests/data/password_change_email.xml', 'r') as file:
+            data = file.read()
+        requests_mock.register_uri(
+            'POST', url, text=data, status_code=status_code)
+        result = self.qa.reset_password(username, email)
+        assert result is True
+        assert len(self.qa.user) == 1
+        assert isinstance(self.qa.user[0], str)
+        assert self.qa.user[0] == username
+        self.tearDown()
+
+    def test_reset_password_single_user_no_send_email(self, requests_mock):
+        self.setUp()
+        username = 'quays7cx25'
+        email = 0
+        endpoint = '/msp/password_change.php'
+        host = constants.QUALYS_API_SCHEME + self.qa.headers['Host']
+        url = host + endpoint
+        status_code = 200
+        with open('tests/data/password_change_no_email.xml', 'r') as file:
+            data = file.read()
+        requests_mock.register_uri(
+            'POST', url, text=data, status_code=status_code)
+        result = self.qa.reset_password(username, email)
+        assert result is True
+        assert len(self.qa.user) == 1
+        assert isinstance(self.qa.user[0], tuple)
+        assert self.qa.user[0][0] == username
+        assert self.qa.user[0][1] == 'password1!'
+        self.tearDown()
+
+    def test_reset_password_multiple_users(self, requests_mock):
+        self.setUp()
+        usernames = ['quays7cx25', 'quays8dy36', 'quays9ez47']
+        email = 0
+        endpoint = '/msp/password_change.php'
+        host = constants.QUALYS_API_SCHEME + self.qa.headers['Host']
+        url = host + endpoint
+        status_code = 200
+        with open('tests/data/password_change_no_email.xml', 'r') as file:
+            data = file.read()
+        requests_mock.register_uri(
+            'POST', url, text=data, status_code=status_code)
+        for username in usernames:
+            result = self.qa.reset_password(username, email)
+            assert result is True
+        assert len(self.qa.user) == 3
+        assert isinstance(self.qa.user[0], tuple)
+        assert self.qa.user[0][0] == usernames[0]
+        assert self.qa.user[0][1] == 'password1!'
+        self.tearDown()
+
+    def test_list_users_failed_unauthenticated(self, requests_mock):
+        self.setUp()
+        endpoint = '/msp/user_list.php'
+        host = constants.QUALYS_API_SCHEME + self.qa.headers['Host']
+        url = host + endpoint
+        status_code = 401
+        requests_mock.register_uri(
+            'GET',
+            url,
+            text='ACCESS DENIED',
+            status_code=status_code)
+        result = self.qa.list_users()
+        assert result is False
+        assert len(self.qa.users) == 0
+        self.tearDown()
+
+    def test_list_users_failed(self, requests_mock):
+        self.setUp()
+        endpoint = '/msp/user_list.php'
+        host = constants.QUALYS_API_SCHEME + self.qa.headers['Host']
+        url = host + endpoint
+        status_code = 200
+        with open('tests/data/list_users_failed.xml', 'r') as file:
+            data = file.read()
+        requests_mock.register_uri(
+            'GET', url, text=data, status_code=status_code)
+        result = self.qa.list_users()
+        assert result is False
+        assert len(self.qa.users) == 0
+        self.tearDown()
+
+    def test_list_users(self, requests_mock):
+        self.setUp()
+        endpoint = '/msp/user_list.php'
+        host = constants.QUALYS_API_SCHEME + self.qa.headers['Host']
+        url = host + endpoint
+        status_code = 200
+        with open('tests/data/list_users.xml', 'r') as file:
+            data = file.read()
+        requests_mock.register_uri(
+            'GET', url, text=data, status_code=status_code)
+        result = self.qa.list_users()
+        assert result is True
+        assert len(self.qa.users) == 2
         self.tearDown()
