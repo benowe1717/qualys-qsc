@@ -6,7 +6,7 @@ ARGPARSE_PROGRAM_DESCRIPTION = 'Qualys QSC Hands-on Training is a `tool` '
 ARGPARSE_PROGRAM_DESCRIPTION += 'that allows `administrators/trainers` to '
 ARGPARSE_PROGRAM_DESCRIPTION += '`provision accounts in a Qualys subscription'
 ARGPARSE_PROGRAM_DESCRIPTION += '.`'
-ARGPARSE_PROGRAM_VERSION = '0.0.4'
+ARGPARSE_PROGRAM_VERSION = '0.0.5'
 ARGPARSE_PROGRAM_AUTHOR = 'Benjamin Owen'
 ARGPARSE_PROGRAM_REPO = 'https://github.com/benowe1717/qualys-qsc'
 
@@ -120,6 +120,7 @@ QUALYS_API_VALID_IN_STATES = [
     'Sikkim', 'Tamil Nadu', 'Tripura', 'Uttar Pradesh', 'Uttaranchal',
     'West Benga'
 ]
+QUALYS_API_USERNAME_FORMAT = 'quays'
 
 # mailmerge
 MAILMERGE_TEMPLATE_KEYS = [

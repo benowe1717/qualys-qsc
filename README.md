@@ -44,9 +44,8 @@ You may want to update the base_url to match where your Qualys instance is
 ## Using
 
 There are two switches that are necessary to know:
-1. `-c/--create`: This will taken the given `users.txt` file and create a user for each record in the CSV
-2. `-a/--create-and-tag`: This will take the given `users.txt` file, create a user for each record in the CSV, create an asset tag using each user's username as the name, then apply the asset tag to the appropriate user, and apply the asset tag to a given asset/host
-3. `-r/--reset-password`: This will ask for a set of usernames (or a single username) and reset the password of that user
+1. `-c/--create`: This will taken the given CSV file and create a user for each record in the CSV
+2. `-r/--reset-password`: This will ask for a set of usernames (or a single username) and reset the password of that user
 
 NOTE: Please ensure that each email address is on a separate line, one email address per line!
 

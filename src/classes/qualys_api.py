@@ -22,6 +22,7 @@ class QualysApi:
     AUS_STATES = constants.QUALYS_API_VALID_AUS_STATES
     CAN_STATES = constants.QUALYS_API_VALID_CAN_STATES
     IN_STATES = constants.QUALYS_API_VALID_IN_STATES
+    USERNAME_FORMAT = constants.QUALYS_API_USERNAME_FORMAT
 
     def __init__(self, credentials_file: str) -> None:
         self.credentials_file = credentials_file
@@ -30,6 +31,7 @@ class QualysApi:
             'Content-Type': self.CONTENT_TYPE,
             'Host': self.credentials['host']
         }
+        self.users = []
         self.user = []
         self.failed_user = []
 
@@ -342,6 +344,13 @@ class QualysApi:
         print(f'send_email must be 1 or 0, is: {value}')
         return False
 
+    def _is_valid_username_format(self, username: str) -> bool:
+        pattern = r"^" + self.USERNAME_FORMAT + r"[a-z0-9]{3,}"
+        if not re.match(pattern, username):
+            print(f'Invalid username format: {username}')
+            return False
+        return True
+
     def test(self) -> bool:
         endpoint = '/api/2.0/fo/report/?action=list'
         url = self.SCHEME + self.headers['Host'] + endpoint
@@ -352,6 +361,44 @@ class QualysApi:
         if r.status_code != 200:
             print(r.status_code, r.text)
             return False
+        return True
+
+    def list_users(self) -> bool:
+        endpoint = '/msp/user_list.php'
+        url = self.SCHEME + self.headers['Host'] + endpoint
+        r = requests.get(
+            url=url,
+            headers=self.headers,
+            auth=self._basic_auth())
+        if r.status_code != 200:
+            error = ('', r.status_code, r.text)
+            self.failed_user.append(error)
+            print(r.status_code, r.text)
+            return False
+        else:
+            response = xmltodict.parse(r.text)
+            try:
+                xml_return = response['USER_LIST_OUTPUT']['RETURN']
+                if xml_return['@status'] == 'FAILED':
+                    code = int(xml_return['@number'])
+                    msg = xml_return['MESSAGE']
+                    error = ('', code, msg)
+                    self.failed_user.append(error)
+                    return False
+            except KeyError:
+                # Qualys does not use the 'RETURN' tag consistently
+                # it is there for both success and failure in the Add User
+                # and the Reset Password calls, but not the basic User List
+                pass
+
+        response = xmltodict.parse(r.text)
+        user_list = response['USER_LIST_OUTPUT']['USER_LIST']
+        for user in user_list['USER']:
+            username = user['USER_LOGIN']
+            userid = user['USER_ID']
+            email = user['CONTACT_INFO']['EMAIL']
+            user_details = (username, userid, email)
+            self.users.append(user_details)
         return True
 
     def add_user(self, **kwargs) -> bool:
@@ -390,7 +437,7 @@ class QualysApi:
             response = xmltodict.parse(r.text)['USER_OUTPUT']['RETURN']
             if response['@status'] == 'FAILED':
                 code = int(response['@number'])
-                msg = int(response['MESSAGE'])
+                msg = response['MESSAGE']
                 error = (payload, code, msg)
                 self.failed_user.append(error)
                 return False
@@ -400,5 +447,50 @@ class QualysApi:
             user = response['USER_LOGIN']
         else:
             user = (response['USER_LOGIN'], response['PASSWORD'])
+        self.user.append(user)
+        return True
+
+    def reset_password(self, username: str, email: int) -> bool:
+        result = self._is_valid_username_format(username)
+        if not result:
+            return False
+
+        result = self._is_valid_send_email(email)
+        if not result:
+            return False
+
+        payload = {
+            'user_logins': username,
+            'email': email
+        }
+        endpoint = '/msp/password_change.php'
+        url = self.SCHEME + self.headers['Host'] + endpoint
+        r = requests.post(
+            url=url,
+            headers=self.headers,
+            data=payload,
+            auth=self._basic_auth())
+        if r.status_code != 200:
+            error = (payload, r.status_code, r.text)
+            self.failed_user.append(error)
+            print(r.status_code, r.text)
+            return False
+        else:
+            response = xmltodict.parse(r.text)
+            xml_return = response['PASSWORD_CHANGE_OUTPUT']['RETURN']
+            if xml_return['@status'] == 'FAILED':
+                code = int(xml_return['@number'])
+                msg = xml_return['MESSAGE']
+                error = (payload, code, msg)
+                self.failed_user.append(error)
+                return False
+
+        response = xmltodict.parse(r.text)
+        xml_return = response['PASSWORD_CHANGE_OUTPUT']['RETURN']['CHANGES']
+        user_list = xml_return['USER_LIST']['USER']
+        if email == 1:
+            user = user_list['USER_LOGIN']
+        else:
+            user = (user_list['USER_LOGIN'], user_list['PASSWORD'])
         self.user.append(user)
         return True
