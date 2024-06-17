@@ -6,7 +6,7 @@ ARGPARSE_PROGRAM_DESCRIPTION = 'Qualys QSC Hands-on Training is a `tool` '
 ARGPARSE_PROGRAM_DESCRIPTION += 'that allows `administrators/trainers` to '
 ARGPARSE_PROGRAM_DESCRIPTION += '`provision accounts in a Qualys subscription'
 ARGPARSE_PROGRAM_DESCRIPTION += '.`'
-ARGPARSE_PROGRAM_VERSION = '0.0.6'
+ARGPARSE_PROGRAM_VERSION = '0.1.0'
 ARGPARSE_PROGRAM_AUTHOR = 'Benjamin Owen'
 ARGPARSE_PROGRAM_REPO = 'https://github.com/benowe1717/qualys-qsc'
 
